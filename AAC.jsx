@@ -69,8 +69,8 @@ const CATEGORIES = {
 
 const LANGUAGES = {
   en: { label: "English", native: "English", field: "en", flag: "🌐", voice: ["en-IN", "en-US", "en-GB", "en"] },
-  ta: { label: "தமிழ்",   native: "தமிழ்",   field: "ta", flag: "🇮🇳", voice: ["ta-IN", "ta"] },
-  hi: { label: "हिन्दी",  native: "हिन्दी",  field: "hi", flag: "🇮🇳", voice: ["hi-IN", "hi"] },
+  ta: { label: "Tamil",   native: "தமிழ்",   field: "ta", flag: "🇮🇳", voice: ["ta-IN", "ta"] },
+  hi: { label: "Hindi",   native: "हिन्दी",  field: "hi", flag: "🇮🇳", voice: ["hi-IN", "hi"] },
   te: { label: "Telugu",  native: "తెలుగు",  field: "te", flag: "🇮🇳", voice: ["te-IN", "te"] },
   bn: { label: "Bengali",   native: "বাংলা",    field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
   mr: { label: "Marathi",   native: "मराठी",    field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
