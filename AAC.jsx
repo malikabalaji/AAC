@@ -580,7 +580,7 @@ const PAPER   = "#F3F4F6"; // neutral gray background
 
 const globalCss = `
   * { box-sizing: border-box; }
-  body { margin: 0; background: ${PAPER}; }
+  body { margin: 0; background: ${PAPER}; font-family: 'Space Grotesk', 'Segoe UI', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
   button { font-family: inherit; cursor: pointer; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
@@ -599,14 +599,14 @@ const CARD_SHADOW = "0 1px 3px rgba(17,24,39,0.06), 0 1px 2px rgba(17,24,39,0.04
 const st = {
   page: {
     minHeight: "100vh", background: PAPER, color: INK,
-    fontFamily: "'Nunito', 'Segoe UI', system-ui, sans-serif",
+    fontFamily: "'Space Grotesk', 'Segoe UI', system-ui, sans-serif",
     maxWidth: 1100, margin: "0 auto", padding: "16px 16px 40px",
   },
 
   /* Language picker screen — clean white landing */
   pickerPage: {
     minHeight: "100vh", color: INK,
-    fontFamily: "'Nunito', 'Segoe UI', system-ui, sans-serif",
+    fontFamily: "'Space Grotesk', 'Segoe UI', system-ui, sans-serif",
     background: "#FFFFFF",
     display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
   },
@@ -615,21 +615,21 @@ const st = {
     padding: "8px 4px 24px", textAlign: "center",
   },
   pickerLogo: { display: "inline-block", marginBottom: 4 },
-  pickerBrand: { margin: "8px 0 4px", fontSize: 38, fontWeight: 900, color: ACCENT, letterSpacing: "-1px" },
+  pickerBrand: { margin: "8px 0 4px", fontSize: 48, fontWeight: 700, color: ACCENT, letterSpacing: "-2px" },
 
   nameField: { maxWidth: 380, margin: "18px auto 34px", textAlign: "left" },
   nameLabel: { display: "block", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED, marginBottom: 6 },
   nameInput: { width: "100%", boxSizing: "border-box", padding: "12px 14px", fontSize: 16, fontWeight: 700, fontFamily: "inherit", color: INK, background: "#fff", border: `1.5px solid ${LINE}`, borderRadius: 8, outline: "none" },
 
-  pickerTitle: { margin: "0 0 20px", fontSize: 32, fontWeight: 900, color: INK, letterSpacing: "-0.5px" },
+  pickerTitle: { margin: "0 0 22px", fontSize: 40, fontWeight: 700, color: INK, letterSpacing: "-1px" },
   pickerGrid: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, maxWidth: 800, margin: "0 auto" },
   pickerTile: {
     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
     minHeight: 96, padding: "16px 8px", borderRadius: 10, border: `1.5px solid ${LINE}`,
     background: "#fff",
   },
-  pickerNative: { fontSize: 21, fontWeight: 900, color: INK, lineHeight: 1.1 },
-  pickerLabel: { fontSize: 12.5, fontWeight: 700, color: MUTED, letterSpacing: "0.2px" },
+  pickerNative: { fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.15 },
+  pickerLabel: { fontSize: 13, fontWeight: 500, color: MUTED, letterSpacing: "0.2px" },
   pickerHint: { margin: "26px 0 0", fontSize: 13, color: "#9CA3AF", fontWeight: 600 },
 
   /* Header name chip + "my name" overlay */
@@ -639,15 +639,15 @@ const st = {
   nameOverlay: { position: "fixed", inset: 0, background: "rgba(17,24,39,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, zIndex: 50 },
   nameOverlayCard: { background: "#fff", borderRadius: 12, padding: "40px 48px", textAlign: "center", maxWidth: 640, width: "100%", boxShadow: "0 24px 60px rgba(0,0,0,0.30)" },
   nameOverlayLabel: { display: "block", fontSize: 18, fontWeight: 700, color: MUTED, marginBottom: 8 },
-  nameOverlayName: { display: "block", fontSize: 72, fontWeight: 900, color: ACCENT, letterSpacing: "-2px", lineHeight: 1.05, wordBreak: "break-word" },
+  nameOverlayName: { display: "block", fontSize: 88, fontWeight: 700, color: ACCENT, letterSpacing: "-3px", lineHeight: 1.05, wordBreak: "break-word" },
   nameOverlayActions: { display: "flex", gap: 10, justifyContent: "center", marginTop: 28 },
   nameOverlaySpeak: { display: "flex", alignItems: "center", height: 48, padding: "0 24px", borderRadius: 8, border: "none", background: TEAL, color: "#fff", fontWeight: 800, fontSize: 17, boxShadow: "0 4px 10px rgba(15,118,110,0.30)" },
   nameOverlayClose: { height: 48, padding: "0 24px", borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", color: INK, fontWeight: 800, fontSize: 17 },
 
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 8, padding: "12px 16px", border: `1px solid ${LINE}`, boxShadow: CARD_SHADOW },
   brandRow: { display: "flex", alignItems: "center", gap: 12 },
-  title: { margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: ACCENT },
-  subtitle: { margin: 0, fontSize: 13, color: MUTED, fontWeight: 700, letterSpacing: "0.3px" },
+  title: { margin: 0, fontSize: 32, fontWeight: 700, letterSpacing: "-1.5px", color: ACCENT },
+  subtitle: { margin: 0, fontSize: 13, color: MUTED, fontWeight: 500, letterSpacing: "0.4px" },
 
   langSelectWrap: { position: "relative", display: "flex", alignItems: "center", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: "0 34px 0 12px" },
   langGlobe: { marginRight: 6 },
@@ -681,7 +681,7 @@ const st = {
   tile: { position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "18px 6px 12px", borderRadius: 8, border: `1px solid ${LINE}`, background: "#fff", overflow: "hidden", transition: "transform 0.08s", boxShadow: CARD_SHADOW },
   tileBar: { position: "absolute", top: 0, left: 0, right: 0, height: 5 },
   tileGlyph: { marginTop: 2 },
-  tileWord: { fontSize: 16, fontWeight: 800, textAlign: "center", marginTop: 6, color: INK },
+  tileWord: { fontSize: 18, fontWeight: 700, textAlign: "center", marginTop: 6, color: INK },
   tileEn: { fontSize: 11, color: "#9CA3AF", fontWeight: 600 },
 
   footer: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 16, boxShadow: CARD_SHADOW },
