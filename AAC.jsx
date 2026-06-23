@@ -20,41 +20,41 @@ import React, { useState, useEffect, useMemo, useRef } from "react";
 ---------------------------------------------------------------------------- */
 const SYMBOLS = [
   // Pronouns / people
-  { id: "i",       glyph: "🧒", cat: "people",  en: "I",      ta: "நான்",     te: "నేను",     hi: "मैं",   bn: "আমি",    mr: "मी" },
-  { id: "you",     glyph: "🫵", cat: "people",  en: "you",    ta: "நீ",       te: "నువ్వు",   hi: "तुम",   bn: "তুমি",   mr: "तू" },
-  { id: "amma",    glyph: "👩", cat: "people",  en: "mother", ta: "அம்மா",    te: "అమ్మ",     hi: "माँ",   bn: "মা",     mr: "आई" },
-  { id: "appa",    glyph: "👨", cat: "people",  en: "father", ta: "அப்பா",    te: "నాన్న",    hi: "पापा",  bn: "বাবা",   mr: "बाबा" },
-  { id: "teacher", glyph: "🧑‍🏫", cat: "people", en: "teacher", ta: "ஆசிரியர்", te: "టీచర్",   hi: "टीचर",  bn: "শিক্ষক",  mr: "शिक्षक" },
+  { id: "i",       glyph: "🧒", cat: "people",  en: "I",      ta: "நான்",     te: "నేను",     hi: "मैं",   bn: "আমি",    mr: "मी",    gu: "હું",    kn: "ನಾನು",   or: "ମୁଁ",    ml: "ഞാൻ" },
+  { id: "you",     glyph: "🫵", cat: "people",  en: "you",    ta: "நீ",       te: "నువ్వు",   hi: "तुम",   bn: "তুমি",   mr: "तू",    gu: "તું",    kn: "ನೀನು",   or: "ତୁମେ",   ml: "നീ" },
+  { id: "amma",    glyph: "👩", cat: "people",  en: "mother", ta: "அம்மா",    te: "అమ్మ",     hi: "माँ",   bn: "মা",     mr: "आई",    gu: "મા",     kn: "ಅಮ್ಮ",    or: "ମା",     ml: "അമ്മ" },
+  { id: "appa",    glyph: "👨", cat: "people",  en: "father", ta: "அப்பா",    te: "నాన్న",    hi: "पापा",  bn: "বাবা",   mr: "बाबा",  gu: "પપ્પા",  kn: "ಅಪ್ಪ",    or: "ବାପା",   ml: "അച്ഛൻ" },
+  { id: "teacher", glyph: "🧑‍🏫", cat: "people", en: "teacher", ta: "ஆசிரியர்", te: "టీచర్",   hi: "टीचर",  bn: "শিক্ষক",  mr: "शिक्षक", gu: "શિક્ષક",  kn: "ಶಿಕ್ಷಕ",  or: "ଶିକ୍ଷକ",  ml: "അധ്യാപകൻ" },
   // Actions
-  { id: "want",    glyph: "🙌", cat: "actions", en: "want",   ta: "வேண்டும்", te: "కావాలి",   hi: "चाहिए", bn: "চাই",    mr: "हवं" },
-  { id: "go",      glyph: "🚶", cat: "actions", en: "go",     ta: "போக",      te: "వెళ్ళు",   hi: "जाना",  bn: "যাওয়া",  mr: "जाणे" },
-  { id: "eat",     glyph: "🍽️", cat: "actions", en: "eat",    ta: "சாப்பிட",  te: "తిను",     hi: "खाना",  bn: "খাওয়া",  mr: "खाणे" },
-  { id: "drink",   glyph: "🥤", cat: "actions", en: "drink",  ta: "குடிக்க",  te: "తాగు",     hi: "पीना",  bn: "পান করা", mr: "पिणे" },
-  { id: "play",    glyph: "🧸", cat: "actions", en: "play",   ta: "விளையாட", te: "ఆడు",      hi: "खेलना", bn: "খেলা",   mr: "खेळणे" },
-  { id: "sleep",   glyph: "😴", cat: "actions", en: "sleep",  ta: "தூங்க",    te: "నిద్ర",    hi: "सोना",  bn: "ঘুম",     mr: "झोपणे" },
-  { id: "stop",    glyph: "✋", cat: "actions", en: "stop",   ta: "நிறுத்து", te: "ఆపు",      hi: "रुको",  bn: "থামো",   mr: "थांब" },
-  { id: "more",    glyph: "➕", cat: "actions", en: "more",   ta: "மேலும்",   te: "ఇంకా",     hi: "और",    bn: "আরও",    mr: "अजून" },
-  { id: "help",    glyph: "🆘", cat: "actions", en: "help",   ta: "உதவி",     te: "సహాయం",   hi: "मदद",   bn: "সাহায্য",  mr: "मदत" },
+  { id: "want",    glyph: "🙌", cat: "actions", en: "want",   ta: "வேண்டும்", te: "కావాలి",   hi: "चाहिए", bn: "চাই",    mr: "हवं",   gu: "જોઈએ",   kn: "ಬೇಕು",    or: "ଦରକାର",  ml: "വേണം" },
+  { id: "go",      glyph: "🚶", cat: "actions", en: "go",     ta: "போக",      te: "వెళ్ళు",   hi: "जाना",  bn: "যাওয়া",  mr: "जाणे",  gu: "જવું",   kn: "ಹೋಗು",   or: "ଯିବା",   ml: "പോകുക" },
+  { id: "eat",     glyph: "🍽️", cat: "actions", en: "eat",    ta: "சாப்பிட",  te: "తిను",     hi: "खाना",  bn: "খাওয়া",  mr: "खाणे",  gu: "ખાવું",  kn: "ತಿನ್ನು",   or: "ଖାଇବା",   ml: "കഴിക്കുക" },
+  { id: "drink",   glyph: "🥤", cat: "actions", en: "drink",  ta: "குடிக்க",  te: "తాగు",     hi: "पीना",  bn: "পান করা", mr: "पिणे",  gu: "પીવું",  kn: "ಕುಡಿ",    or: "ପିଇବା",   ml: "കുടിക്കുക" },
+  { id: "play",    glyph: "🧸", cat: "actions", en: "play",   ta: "விளையாட", te: "ఆడు",      hi: "खेलना", bn: "খেলা",   mr: "खेळणे", gu: "રમવું",  kn: "ಆಟ",      or: "ଖେଳିବା",  ml: "കളിക്കുക" },
+  { id: "sleep",   glyph: "😴", cat: "actions", en: "sleep",  ta: "தூங்க",    te: "నిద్ర",    hi: "सोना",  bn: "ঘুম",     mr: "झोपणे", gu: "સૂવું",  kn: "ನಿದ್ರೆ",   or: "ଶୋଇବା",   ml: "ഉറങ്ങുക" },
+  { id: "stop",    glyph: "✋", cat: "actions", en: "stop",   ta: "நிறுத்து", te: "ఆపు",      hi: "रुको",  bn: "থামো",   mr: "थांब",  gu: "રોકો",   kn: "ನಿಲ್ಲಿಸು", or: "ଅଟକ",    ml: "നിർത്തുക" },
+  { id: "more",    glyph: "➕", cat: "actions", en: "more",   ta: "மேலும்",   te: "ఇంకా",     hi: "और",    bn: "আরও",    mr: "अजून",  gu: "વધારે",  kn: "ಇನ್ನೂ",   or: "ଅଧିକ",   ml: "കൂടുതൽ" },
+  { id: "help",    glyph: "🆘", cat: "actions", en: "help",   ta: "உதவி",     te: "సహాయం",   hi: "मदद",   bn: "সাহায্য",  mr: "मदत",   gu: "મદદ",    kn: "ಸಹಾಯ",    or: "ସାହାଯ୍ୟ",  ml: "സഹായം" },
   // Objects
-  { id: "water",   glyph: "💧", cat: "objects", en: "water",  ta: "தண்ணீர்",  te: "నీళ్ళు",   hi: "पानी",  bn: "জল",     mr: "पाणी" },
-  { id: "food",    glyph: "🍚", cat: "objects", en: "food",   ta: "உணவு",     te: "అన్నం",    hi: "खाना",  bn: "খাবার",  mr: "जेवण" },
-  { id: "milk",    glyph: "🥛", cat: "objects", en: "milk",   ta: "பால்",     te: "పాలు",     hi: "दूध",   bn: "দুধ",     mr: "दूध" },
-  { id: "toilet",  glyph: "🚽", cat: "objects", en: "toilet", ta: "கழிப்பறை", te: "టాయిలెట్", hi: "टॉयलेट", bn: "টয়লেট",  mr: "टॉयलेट" },
-  { id: "school",  glyph: "🏫", cat: "objects", en: "school", ta: "பள்ளி",    te: "స్కూల్",   hi: "स्कूल",  bn: "স্কুল",   mr: "शाळा" },
-  { id: "home",    glyph: "🏠", cat: "objects", en: "home",   ta: "வீடு",     te: "ఇల్లు",    hi: "घर",    bn: "বাড়ি",   mr: "घर" },
-  { id: "toy",     glyph: "🪀", cat: "objects", en: "toy",    ta: "பொம்மை",   te: "ఆటబొమ్మ",  hi: "खिलौना", bn: "খেলনা",  mr: "खेळणं" },
-  { id: "book",    glyph: "📖", cat: "objects", en: "book",   ta: "புத்தகம்", te: "పుస్తకం",  hi: "किताब", bn: "বই",     mr: "पुस्तक" },
+  { id: "water",   glyph: "💧", cat: "objects", en: "water",  ta: "தண்ணீர்",  te: "నీళ్ళు",   hi: "पानी",  bn: "জল",     mr: "पाणी",  gu: "પાણી",   kn: "ನೀರು",    or: "ପାଣି",    ml: "വെള്ളം" },
+  { id: "food",    glyph: "🍚", cat: "objects", en: "food",   ta: "உணவு",     te: "అన్నం",    hi: "खाना",  bn: "খাবার",  mr: "जेवण",  gu: "ખોરાક",  kn: "ಆಹಾರ",    or: "ଖାଦ୍ୟ",   ml: "ഭക്ഷണം" },
+  { id: "milk",    glyph: "🥛", cat: "objects", en: "milk",   ta: "பால்",     te: "పాలు",     hi: "दूध",   bn: "দুধ",     mr: "दूध",   gu: "દૂધ",    kn: "ಹಾಲು",    or: "ଦୁଧ",     ml: "പാൽ" },
+  { id: "toilet",  glyph: "🚽", cat: "objects", en: "toilet", ta: "கழிப்பறை", te: "టాయిలెట్", hi: "टॉयलेट", bn: "টয়লেট",  mr: "टॉयलेट", gu: "ટોઇલેટ",  kn: "ಟಾಯ್ಲೆಟ್", or: "ଟଏଲେଟ୍",  ml: "ടോയ്‌ലറ്റ്" },
+  { id: "school",  glyph: "🏫", cat: "objects", en: "school", ta: "பள்ளி",    te: "స్కూల్",   hi: "स्कूल",  bn: "স্কুল",   mr: "शाळा",  gu: "શાળા",   kn: "ಶಾಲೆ",    or: "ସ୍କୁଲ୍",   ml: "സ്കൂൾ" },
+  { id: "home",    glyph: "🏠", cat: "objects", en: "home",   ta: "வீடு",     te: "ఇల్లు",    hi: "घर",    bn: "বাড়ি",   mr: "घर",    gu: "ઘર",     kn: "ಮನೆ",     or: "ଘର",     ml: "വീട്" },
+  { id: "toy",     glyph: "🪀", cat: "objects", en: "toy",    ta: "பொம்மை",   te: "ఆటబొమ్మ",  hi: "खिलौना", bn: "খেলনা",  mr: "खेळणं", gu: "રમકડું",  kn: "ಆಟಿಕೆ",   or: "ଖେଳନା",   ml: "കളിപ്പാട്ടം" },
+  { id: "book",    glyph: "📖", cat: "objects", en: "book",   ta: "புத்தகம்", te: "పుస్తకం",  hi: "किताब", bn: "বই",     mr: "पुस्तक", gu: "પુસ્તક",  kn: "ಪುಸ್ತಕ",   or: "ବହି",     ml: "പുസ്തകം" },
   // Feelings
-  { id: "happy",   glyph: "😊", cat: "feelings", en: "happy", ta: "மகிழ்ச்சி", te: "సంతోషం",  hi: "खुश",   bn: "খুশি",   mr: "आनंदी" },
-  { id: "sad",     glyph: "😢", cat: "feelings", en: "sad",   ta: "சோகம்",    te: "బాధ",      hi: "दुखी",  bn: "দুঃখ",   mr: "दुःखी" },
-  { id: "hungry",  glyph: "🤤", cat: "feelings", en: "hungry", ta: "பசி",     te: "ఆకలి",     hi: "भूख",   bn: "ক্ষুধা",  mr: "भूक" },
-  { id: "tired",   glyph: "🥱", cat: "feelings", en: "tired", ta: "சோர்வு",   te: "అలసట",     hi: "थका",   bn: "ক্লান্ত",  mr: "थकलो" },
-  { id: "pain",    glyph: "🤕", cat: "feelings", en: "pain",  ta: "வலி",      te: "నొప్పి",   hi: "दर्द",  bn: "ব্যথা",   mr: "वेदना" },
+  { id: "happy",   glyph: "😊", cat: "feelings", en: "happy", ta: "மகிழ்ச்சி", te: "సంతోషం",  hi: "खुश",   bn: "খুশি",   mr: "आनंदी", gu: "ખુશ",    kn: "ಸಂತೋಷ",   or: "ଖୁସି",    ml: "സന്തോഷം" },
+  { id: "sad",     glyph: "😢", cat: "feelings", en: "sad",   ta: "சோகம்",    te: "బాధ",      hi: "दुखी",  bn: "দুঃখ",   mr: "दुःखी", gu: "ઉદાસ",   kn: "ದುಃಖ",    or: "ଦୁଃଖ",    ml: "സങ്കടം" },
+  { id: "hungry",  glyph: "🤤", cat: "feelings", en: "hungry", ta: "பசி",     te: "ఆకలి",     hi: "भूख",   bn: "ক্ষুধা",  mr: "भूक",   gu: "ભૂખ",    kn: "ಹಸಿವು",   or: "ଭୋକ",    ml: "വിശപ്പ്" },
+  { id: "tired",   glyph: "🥱", cat: "feelings", en: "tired", ta: "சோர்வு",   te: "అలసట",     hi: "थका",   bn: "ক্লান্ত",  mr: "थकलो",  gu: "થાક",    kn: "ಸುಸ್ತು",   or: "ଥକା",    ml: "ക്ഷീണം" },
+  { id: "pain",    glyph: "🤕", cat: "feelings", en: "pain",  ta: "வலி",      te: "నొప్పి",   hi: "दर्द",  bn: "ব্যথা",   mr: "वेदना", gu: "દુખાવો",  kn: "ನೋವು",    or: "ବ୍ୟଥା",   ml: "വേദന" },
   // Social
-  { id: "yes",     glyph: "✅", cat: "social",  en: "yes",    ta: "ஆம்",      te: "అవును",    hi: "हाँ",   bn: "হ্যাঁ",   mr: "हो" },
-  { id: "no",      glyph: "❌", cat: "social",  en: "no",     ta: "இல்லை",    te: "కాదు",     hi: "नहीं",  bn: "না",     mr: "नाही" },
-  { id: "thanks",  glyph: "🙏", cat: "social",  en: "thank you", ta: "நன்றி", te: "ధన్యవాదాలు", hi: "धन्यवाद", bn: "ধন্যবাদ", mr: "धन्यवाद" },
-  { id: "hello",   glyph: "👋", cat: "social",  en: "hello",  ta: "வணக்கம்",  te: "నమస్తే",   hi: "नमस्ते", bn: "নমস্কার", mr: "नमस्कार" },
+  { id: "yes",     glyph: "✅", cat: "social",  en: "yes",    ta: "ஆம்",      te: "అవును",    hi: "हाँ",   bn: "হ্যাঁ",   mr: "हो",    gu: "હા",     kn: "ಹೌದು",    or: "ହଁ",     ml: "അതെ" },
+  { id: "no",      glyph: "❌", cat: "social",  en: "no",     ta: "இல்லை",    te: "కాదు",     hi: "नहीं",  bn: "না",     mr: "नाही",  gu: "ના",     kn: "ಇಲ್ಲ",    or: "ନା",     ml: "അല്ല" },
+  { id: "thanks",  glyph: "🙏", cat: "social",  en: "thank you", ta: "நன்றி", te: "ధన్యవాదాలు", hi: "धन्यवाद", bn: "ধন্যবাদ", mr: "धन्यवाद", gu: "આભાર",   kn: "ಧನ್ಯವಾದ",  or: "ଧନ୍ୟବାଦ",  ml: "നന്ദി" },
+  { id: "hello",   glyph: "👋", cat: "social",  en: "hello",  ta: "வணக்கம்",  te: "నమస్తే",   hi: "नमस्ते", bn: "নমস্কার", mr: "नमस्कार", gu: "નમસ્તે",  kn: "ನಮಸ್ಕಾರ",  or: "ନମସ୍କାର",  ml: "നമസ്കാരം" },
 ];
 
 const SYMBOL_BY_ID = Object.fromEntries(SYMBOLS.map((s) => [s.id, s]));
@@ -72,8 +72,12 @@ const LANGUAGES = {
   ta: { label: "தமிழ்",   native: "தமிழ்",   field: "ta", flag: "🇮🇳", voice: ["ta-IN", "ta"] },
   hi: { label: "हिन्दी",  native: "हिन्दी",  field: "hi", flag: "🇮🇳", voice: ["hi-IN", "hi"] },
   te: { label: "Telugu",  native: "తెలుగు",  field: "te", flag: "🇮🇳", voice: ["te-IN", "te"] },
-  bn: { label: "Bengali", native: "বাংলা",   field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
-  mr: { label: "Marathi", native: "मराठी",   field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
+  bn: { label: "Bengali",   native: "বাংলা",    field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
+  mr: { label: "Marathi",   native: "मराठी",    field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
+  gu: { label: "Gujarati",  native: "ગુજરાતી",  field: "gu", flag: "🇮🇳", voice: ["gu-IN", "gu"] },
+  kn: { label: "Kannada",   native: "ಕನ್ನಡ",     field: "kn", flag: "🇮🇳", voice: ["kn-IN", "kn"] },
+  or: { label: "Odia",      native: "ଓଡ଼ିଆ",     field: "or", flag: "🇮🇳", voice: ["or-IN", "or"] },
+  ml: { label: "Malayalam", native: "മലയാളം",   field: "ml", flag: "🇮🇳", voice: ["ml-IN", "ml"] },
 };
 
 /* ----------------------------------------------------------------------------
@@ -299,6 +303,8 @@ export default function App() {
 
   const [lang, setLang] = useState("en");
   const [langChosen, setLangChosen] = useState(false); // show picker until a language is chosen
+  const [childName, setChildName] = useState("");      // child's name, entered on the landing page
+  const [showName, setShowName] = useState(false);     // big "my name" overlay
   const [sentence, setSentence] = useState([]);      // array of symbol ids
   const [personalFreq, setPersonalFreq] = useState({});
   const [recent, setRecent] = useState([]);
@@ -349,12 +355,23 @@ export default function App() {
         <div style={st.pickerCard}>
           <div style={st.pickerLogo}><Logo size={72} /></div>
           <h1 style={st.pickerBrand}>Sira</h1>
+
+          <div style={st.nameField}>
+            <label style={st.nameLabel} htmlFor="childName">Your name</label>
+            <input
+              id="childName"
+              type="text"
+              value={childName}
+              onChange={(e) => setChildName(e.target.value)}
+              placeholder="Type your name"
+              style={st.nameInput}
+            />
+          </div>
+
           <h2 style={st.pickerTitle}>Choose a language</h2>
-          <p style={st.pickerSub}>உங்கள் மொழியைத் தேர்ந்தெடுக்கவும் · अपनी भाषा चुनें</p>
           <div style={st.pickerGrid}>
             {Object.entries(LANGUAGES).map(([k, v]) => (
-              <button key={k} onClick={() => chooseLang(k)} className="tile-press" style={st.pickerTile}>
-                <Om ch={v.flag} size={34} style={st.pickerFlag} />
+              <button key={k} onClick={() => chooseLang(k)} className="tile-press lang-tile" style={st.pickerTile}>
                 <span style={st.pickerNative}>{v.native}</span>
                 <span style={st.pickerLabel}>{v.label}</span>
               </button>
@@ -379,23 +396,56 @@ export default function App() {
             <p style={st.subtitle}>Tap · Talk · Connect</p>
           </div>
         </div>
-        <div style={st.langSelectWrap}>
-          <Om ch="🌐" size={16} style={st.langGlobe} />
-          <select
-            value={lang}
-            onChange={(e) => setLang(e.target.value)}
-            style={st.langSelect}
-            aria-label="Language"
-          >
-            {Object.entries(LANGUAGES).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v.native} · {v.label}
-              </option>
-            ))}
-          </select>
-          <span style={st.langCaret}>▾</span>
+        <div style={st.headerRight}>
+          {childName.trim() && (
+            <button
+              style={st.nameChip}
+              onClick={() => { setShowName(true); speak(childName.trim(), lang, voices); }}
+              title="Show my name"
+            >
+              <Om ch="👤" size={18} style={{ marginRight: 6 }} />
+              <span style={st.nameChipText}>{childName.trim()}</span>
+            </button>
+          )}
+          <div style={st.langSelectWrap}>
+            <Om ch="🌐" size={16} style={st.langGlobe} />
+            <select
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              style={st.langSelect}
+              aria-label="Language"
+            >
+              {Object.entries(LANGUAGES).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v.native} · {v.label}
+                </option>
+              ))}
+            </select>
+            <span style={st.langCaret}>▾</span>
+          </div>
         </div>
       </header>
+
+      {/* "My name" overlay — for when someone asks the child their name */}
+      {showName && (
+        <div style={st.nameOverlay} onClick={() => setShowName(false)}>
+          <div style={st.nameOverlayCard} onClick={(e) => e.stopPropagation()}>
+            <span style={st.nameOverlayLabel}>My name is</span>
+            <span style={st.nameOverlayName}>{childName.trim()}</span>
+            <div style={st.nameOverlayActions}>
+              <button
+                style={st.nameOverlaySpeak}
+                onClick={() => speak(childName.trim(), lang, voices)}
+              >
+                <Om ch="🔊" size={20} style={{ marginRight: 8 }} /> Speak
+              </button>
+              <button style={st.nameOverlayClose} onClick={() => setShowName(false)}>
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sentence strip */}
       <section style={st.sentenceBar}>
@@ -535,6 +585,12 @@ const globalCss = `
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
   .tile-press:active { transform: scale(0.96); }
+  .lang-tile { transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
+  .lang-tile:hover {
+    border-color: ${ACCENT};
+    box-shadow: 0 6px 18px rgba(37,99,235,0.14);
+    transform: translateY(-3px);
+  }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 `;
 
@@ -547,33 +603,46 @@ const st = {
     maxWidth: 1100, margin: "0 auto", padding: "16px 16px 40px",
   },
 
-  /* Language picker screen */
+  /* Language picker screen — clean white landing */
   pickerPage: {
     minHeight: "100vh", color: INK,
     fontFamily: "'Nunito', 'Segoe UI', system-ui, sans-serif",
-    background: `linear-gradient(135deg, ${ACCENT2} 0%, ${ACCENT} 100%)`,
-    display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+    background: "#FFFFFF",
+    display: "flex", alignItems: "center", justifyContent: "center", padding: 24,
   },
   pickerCard: {
-    width: "100%", maxWidth: 640, background: "#fff", borderRadius: 12,
-    padding: "36px 28px 28px", textAlign: "center",
-    boxShadow: "0 24px 60px rgba(30,58,138,0.30)",
+    width: "100%", maxWidth: 880, background: "#fff",
+    padding: "8px 4px 24px", textAlign: "center",
   },
   pickerLogo: { display: "inline-block", marginBottom: 4 },
-  pickerBrand: { margin: "8px 0 0", fontSize: 36, fontWeight: 900, color: ACCENT, letterSpacing: "-1px" },
-  pickerTitle: { margin: "10px 0 4px", fontSize: 22, fontWeight: 800, color: INK, letterSpacing: "-0.3px" },
-  pickerSub: { margin: "0 0 22px", fontSize: 15, color: MUTED, fontWeight: 700 },
-  pickerGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 },
+  pickerBrand: { margin: "8px 0 4px", fontSize: 38, fontWeight: 900, color: ACCENT, letterSpacing: "-1px" },
+
+  nameField: { maxWidth: 380, margin: "18px auto 34px", textAlign: "left" },
+  nameLabel: { display: "block", fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED, marginBottom: 6 },
+  nameInput: { width: "100%", boxSizing: "border-box", padding: "12px 14px", fontSize: 16, fontWeight: 700, fontFamily: "inherit", color: INK, background: "#fff", border: `1.5px solid ${LINE}`, borderRadius: 8, outline: "none" },
+
+  pickerTitle: { margin: "0 0 20px", fontSize: 32, fontWeight: 900, color: INK, letterSpacing: "-0.5px" },
+  pickerGrid: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, maxWidth: 800, margin: "0 auto" },
   pickerTile: {
-    display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-    padding: "20px 8px", borderRadius: 8, border: `1px solid ${LINE}`,
-    background: "#fff", transition: "transform 0.08s, box-shadow 0.15s",
-    boxShadow: CARD_SHADOW,
+    display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+    minHeight: 96, padding: "16px 8px", borderRadius: 10, border: `1.5px solid ${LINE}`,
+    background: "#fff",
   },
-  pickerFlag: { display: "block" },
-  pickerNative: { fontSize: 20, fontWeight: 900, color: INK, marginTop: 2 },
-  pickerLabel: { fontSize: 13, fontWeight: 700, color: MUTED },
-  pickerHint: { margin: "22px 0 0", fontSize: 13, color: "#9CA3AF", fontWeight: 600 },
+  pickerNative: { fontSize: 21, fontWeight: 900, color: INK, lineHeight: 1.1 },
+  pickerLabel: { fontSize: 12.5, fontWeight: 700, color: MUTED, letterSpacing: "0.2px" },
+  pickerHint: { margin: "26px 0 0", fontSize: 13, color: "#9CA3AF", fontWeight: 600 },
+
+  /* Header name chip + "my name" overlay */
+  headerRight: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
+  nameChip: { display: "flex", alignItems: "center", background: "#EFF6FF", border: `1.5px solid #BFDBFE`, borderRadius: 8, padding: "8px 14px" },
+  nameChipText: { fontSize: 16, fontWeight: 900, color: ACCENT, letterSpacing: "-0.2px" },
+  nameOverlay: { position: "fixed", inset: 0, background: "rgba(17,24,39,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 24, zIndex: 50 },
+  nameOverlayCard: { background: "#fff", borderRadius: 12, padding: "40px 48px", textAlign: "center", maxWidth: 640, width: "100%", boxShadow: "0 24px 60px rgba(0,0,0,0.30)" },
+  nameOverlayLabel: { display: "block", fontSize: 18, fontWeight: 700, color: MUTED, marginBottom: 8 },
+  nameOverlayName: { display: "block", fontSize: 72, fontWeight: 900, color: ACCENT, letterSpacing: "-2px", lineHeight: 1.05, wordBreak: "break-word" },
+  nameOverlayActions: { display: "flex", gap: 10, justifyContent: "center", marginTop: 28 },
+  nameOverlaySpeak: { display: "flex", alignItems: "center", height: 48, padding: "0 24px", borderRadius: 8, border: "none", background: TEAL, color: "#fff", fontWeight: 800, fontSize: 17, boxShadow: "0 4px 10px rgba(15,118,110,0.30)" },
+  nameOverlayClose: { height: 48, padding: "0 24px", borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", color: INK, fontWeight: 800, fontSize: 17 },
 
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 8, padding: "12px 16px", border: `1px solid ${LINE}`, boxShadow: CARD_SHADOW },
   brandRow: { display: "flex", alignItems: "center", gap: 12 },
