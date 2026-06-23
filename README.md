@@ -1,4 +1,4 @@
-# Mynah 🐦
+# Sira 💬
 
 **Tap · Talk · Connect** — a predictive, multilingual AAC (Augmentative and Alternative Communication) board for non-verbal children.
 

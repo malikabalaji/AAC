@@ -60,11 +60,11 @@ const SYMBOLS = [
 const SYMBOL_BY_ID = Object.fromEntries(SYMBOLS.map((s) => [s.id, s]));
 
 const CATEGORIES = {
-  people:   { label: "People",   color: "#F2C14E" },
-  actions:  { label: "Actions",  color: "#7FB069" },
-  objects:  { label: "Things",   color: "#6EC6CA" },
-  feelings: { label: "Feelings", color: "#E8836F" },
-  social:   { label: "Social",   color: "#B58DB6" },
+  people:   { label: "People",   color: "#2563EB" }, // deep blue  — primary
+  actions:  { label: "Actions",  color: "#0F766E" }, // teal       — communication
+  objects:  { label: "Things",   color: "#D97706" }, // amber      — attention
+  feelings: { label: "Feelings", color: "#7C3AED" }, // purple     — emotions
+  social:   { label: "Social",   color: "#7C3AED" }, // purple     — social
 };
 
 const LANGUAGES = {
@@ -75,6 +75,61 @@ const LANGUAGES = {
   bn: { label: "Bengali", native: "বাংলা",   field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
   mr: { label: "Marathi", native: "मराठी",   field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
 };
+
+/* ----------------------------------------------------------------------------
+   OPENMOJI RENDERING
+   We render the friendly, consistent OpenMoji pictograms (color SVGs) instead
+   of relying on each device's native emoji font. An emoji string is converted
+   to OpenMoji's hex-codepoint filename (variation selectors stripped, ZWJ kept).
+---------------------------------------------------------------------------- */
+const OPENMOJI_BASE = "https://cdn.jsdelivr.net/npm/openmoji@15.0.0/color/svg/";
+
+function openmojiUrl(emoji) {
+  const cps = [];
+  for (const ch of emoji) {
+    const cp = ch.codePointAt(0);
+    if (cp === 0xfe0f) continue; // OpenMoji filenames drop the VS16 selector
+    cps.push(cp.toString(16).toUpperCase());
+  }
+  return OPENMOJI_BASE + cps.join("-") + ".svg";
+}
+
+function Om({ ch, size = 40, style }) {
+  return (
+    <img
+      src={openmojiUrl(ch)}
+      alt=""
+      width={size}
+      height={size}
+      loading="lazy"
+      draggable={false}
+      style={{ display: "inline-block", verticalAlign: "middle", ...style }}
+    />
+  );
+}
+
+/* Sira logo — a sharp speech bubble holding three symbol dots (a board in a
+   bubble). White mark on a blue gradient tile. */
+function Logo({ size = 44 }) {
+  return (
+    <span
+      style={{
+        width: size, height: size, flexShrink: 0,
+        borderRadius: Math.round(size * 0.2),
+        background: "linear-gradient(135deg, #3B82F6, #2563EB)",
+        display: "inline-flex", alignItems: "center", justifyContent: "center",
+        boxShadow: "0 2px 6px rgba(37,99,235,0.35)",
+      }}
+    >
+      <svg viewBox="0 0 32 32" width={Math.round(size * 0.62)} height={Math.round(size * 0.62)} aria-hidden="true">
+        <path d="M5 5 H27 V21 H13 L7 27 V21 H5 Z" fill="#fff" />
+        <circle cx="11.5" cy="13" r="2" fill="#2563EB" />
+        <circle cx="16" cy="13" r="2" fill="#2563EB" />
+        <circle cx="20.5" cy="13" r="2" fill="#2563EB" />
+      </svg>
+    </span>
+  );
+}
 
 /* ----------------------------------------------------------------------------
    2. SYNTHETIC TRAINING CORPUS
@@ -292,14 +347,14 @@ export default function App() {
       <div style={st.pickerPage}>
         <style>{globalCss}</style>
         <div style={st.pickerCard}>
-          <span style={st.pickerLogo}>🐦</span>
-          <h1 style={st.pickerBrand}>Mynah</h1>
+          <div style={st.pickerLogo}><Logo size={72} /></div>
+          <h1 style={st.pickerBrand}>Sira</h1>
           <h2 style={st.pickerTitle}>Choose a language</h2>
           <p style={st.pickerSub}>உங்கள் மொழியைத் தேர்ந்தெடுக்கவும் · अपनी भाषा चुनें</p>
           <div style={st.pickerGrid}>
             {Object.entries(LANGUAGES).map(([k, v]) => (
               <button key={k} onClick={() => chooseLang(k)} className="tile-press" style={st.pickerTile}>
-                <span style={st.pickerFlag}>{v.flag}</span>
+                <Om ch={v.flag} size={34} style={st.pickerFlag} />
                 <span style={st.pickerNative}>{v.native}</span>
                 <span style={st.pickerLabel}>{v.label}</span>
               </button>
@@ -318,14 +373,14 @@ export default function App() {
       {/* Header */}
       <header style={st.header}>
         <div style={st.brandRow}>
-          <span style={st.logoDot}>🐦</span>
+          <Logo size={44} />
           <div>
-            <h1 style={st.title}>Mynah</h1>
+            <h1 style={st.title}>Sira</h1>
             <p style={st.subtitle}>Tap · Talk · Connect</p>
           </div>
         </div>
         <div style={st.langSelectWrap}>
-          <span style={st.langGlobe}>🌐</span>
+          <Om ch="🌐" size={16} style={st.langGlobe} />
           <select
             value={lang}
             onChange={(e) => setLang(e.target.value)}
@@ -352,7 +407,7 @@ export default function App() {
               const s = SYMBOL_BY_ID[id];
               return (
                 <div key={i} style={st.sentChip}>
-                  <span style={st.sentGlyph}>{s.glyph}</span>
+                  <Om ch={s.glyph} size={28} />
                   <span style={st.sentWord}>{s[field]}</span>
                 </div>
               );
@@ -360,9 +415,11 @@ export default function App() {
           )}
         </div>
         <div style={st.sentActions}>
-          <button onClick={backspace} style={st.iconBtn} title="Delete last" disabled={!sentence.length}>⌫</button>
-          <button onClick={clearAll} style={st.iconBtn} title="Clear" disabled={!sentence.length}>🗑️</button>
-          <button onClick={speakSentence} style={st.speakBtn} disabled={!sentence.length}>🔊 Speak</button>
+          <button onClick={backspace} style={st.iconBtn} title="Delete last" disabled={!sentence.length}><Om ch="⬅️" size={22} /></button>
+          <button onClick={clearAll} style={st.iconBtn} title="Clear" disabled={!sentence.length}><Om ch="🗑️" size={22} /></button>
+          <button onClick={speakSentence} style={st.speakBtn} disabled={!sentence.length}>
+            <Om ch="🔊" size={20} style={{ marginRight: 8 }} /> Speak
+          </button>
         </div>
       </section>
 
@@ -373,7 +430,7 @@ export default function App() {
             Suggested next
             <button style={st.infoBtn} onClick={() => setShowPredInfo((v) => !v)}>?</button>
           </span>
-          <span style={st.todTag}>🕒 {tod}</span>
+          <span style={st.todTag}><Om ch="🕒" size={15} style={{ marginRight: 5 }} /> {tod}</span>
         </div>
         {showPredInfo && (
           <div style={st.infoBox}>
@@ -387,7 +444,7 @@ export default function App() {
             const s = SYMBOL_BY_ID[id];
             return (
               <button key={id} onClick={() => addSymbol(id)} style={st.predTile}>
-                <span style={st.predGlyph}>{s.glyph}</span>
+                <Om ch={s.glyph} size={32} />
                 <span style={st.predWord}>{s[field]}</span>
               </button>
             );
@@ -426,7 +483,7 @@ export default function App() {
             style={{ ...st.tile, borderColor: CATEGORIES[s.cat].color }}
           >
             <span style={{ ...st.tileBar, background: CATEGORIES[s.cat].color }} />
-            <span style={st.tileGlyph}>{s.glyph}</span>
+            <Om ch={s.glyph} size={44} style={st.tileGlyph} />
             <span style={st.tileWord}>{s[field]}</span>
             {field !== "en" && <span style={st.tileEn}>{s.en}</span>}
           </button>
@@ -448,7 +505,7 @@ export default function App() {
           <label style={st.footLabel}>Child's top used symbols (learned live)</label>
           <div style={st.freqRow}>
             {Object.entries(personalFreq).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id, c]) => (
-              <span key={id} style={st.freqPill}>{SYMBOL_BY_ID[id].glyph} {c}</span>
+              <span key={id} style={st.freqPill}><Om ch={SYMBOL_BY_ID[id].glyph} size={18} style={{ marginRight: 4 }} /> {c}</span>
             ))}
             {Object.keys(personalFreq).length === 0 && (
               <span style={st.freqEmpty}>Nothing yet. Start tapping.</span>
@@ -463,24 +520,29 @@ export default function App() {
 /* ----------------------------------------------------------------------------
    STYLES
 ---------------------------------------------------------------------------- */
-const ACCENT = "#00A6A6";
-const ACCENT2 = "#3DC2EC";
-const INK = "#1E2A45";
-const PAPER = "#F4FBFF";
+const ACCENT  = "#2563EB"; // Deep Blue — primary / navigation / main actions
+const ACCENT2 = "#3B82F6"; // lighter blue for gradients
+const TEAL    = "#0F766E"; // Teal — communication / Speak
+const INK     = "#374151"; // neutral text
+const MUTED   = "#6B7280"; // secondary text
+const LINE    = "#E5E7EB"; // hairline borders
+const PAPER   = "#F3F4F6"; // neutral gray background
 
 const globalCss = `
   * { box-sizing: border-box; }
-  body { margin: 0; background: #F4FBFF; }
+  body { margin: 0; background: ${PAPER}; }
   button { font-family: inherit; cursor: pointer; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
-  .tile-press:active { transform: scale(0.95); }
+  .tile-press:active { transform: scale(0.96); }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 `;
 
+const CARD_SHADOW = "0 1px 3px rgba(17,24,39,0.06), 0 1px 2px rgba(17,24,39,0.04)";
+
 const st = {
   page: {
-    minHeight: "100vh", background: `linear-gradient(180deg, #EAF9FF 0%, ${PAPER} 40%)`, color: INK,
+    minHeight: "100vh", background: PAPER, color: INK,
     fontFamily: "'Nunito', 'Segoe UI', system-ui, sans-serif",
     maxWidth: 1100, margin: "0 auto", padding: "16px 16px 40px",
   },
@@ -493,75 +555,72 @@ const st = {
     display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
   },
   pickerCard: {
-    width: "100%", maxWidth: 640, background: "#fff", borderRadius: 28,
+    width: "100%", maxWidth: 640, background: "#fff", borderRadius: 12,
     padding: "36px 28px 28px", textAlign: "center",
-    boxShadow: "0 24px 60px rgba(0,80,90,0.30)",
+    boxShadow: "0 24px 60px rgba(30,58,138,0.30)",
   },
-  pickerLogo: { fontSize: 52, lineHeight: 1, display: "inline-block" },
+  pickerLogo: { display: "inline-block", marginBottom: 4 },
   pickerBrand: { margin: "8px 0 0", fontSize: 36, fontWeight: 900, color: ACCENT, letterSpacing: "-1px" },
   pickerTitle: { margin: "10px 0 4px", fontSize: 22, fontWeight: 800, color: INK, letterSpacing: "-0.3px" },
-  pickerSub: { margin: "0 0 22px", fontSize: 15, color: "#6B7A90", fontWeight: 700 },
+  pickerSub: { margin: "0 0 22px", fontSize: 15, color: MUTED, fontWeight: 700 },
   pickerGrid: { display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 },
   pickerTile: {
     display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-    padding: "20px 8px", borderRadius: 20, border: "2px solid #E6F4F6",
-    background: "linear-gradient(180deg, #FFFFFF, #F2FBFC)", transition: "transform 0.08s, box-shadow 0.15s",
-    boxShadow: "0 4px 14px rgba(0,120,130,0.08)",
+    padding: "20px 8px", borderRadius: 8, border: `1px solid ${LINE}`,
+    background: "#fff", transition: "transform 0.08s, box-shadow 0.15s",
+    boxShadow: CARD_SHADOW,
   },
-  pickerFlag: { fontSize: 34, lineHeight: 1 },
+  pickerFlag: { display: "block" },
   pickerNative: { fontSize: 20, fontWeight: 900, color: INK, marginTop: 2 },
-  pickerLabel: { fontSize: 13, fontWeight: 700, color: "#7A8AA0" },
-  pickerHint: { margin: "22px 0 0", fontSize: 13, color: "#9AA4B2", fontWeight: 600 },
+  pickerLabel: { fontSize: 13, fontWeight: 700, color: MUTED },
+  pickerHint: { margin: "22px 0 0", fontSize: 13, color: "#9CA3AF", fontWeight: 600 },
 
-  header: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 20, padding: "14px 18px", boxShadow: "0 6px 20px rgba(0,120,130,0.08)" },
+  header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 8, padding: "12px 16px", border: `1px solid ${LINE}`, boxShadow: CARD_SHADOW },
   brandRow: { display: "flex", alignItems: "center", gap: 12 },
-  logoDot: { width: 44, height: 44, borderRadius: 14, background: `linear-gradient(135deg, ${ACCENT2}, ${ACCENT})`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, boxShadow: "0 4px 12px rgba(0,166,166,0.35)" },
-  title: { margin: 0, fontSize: 30, fontWeight: 900, letterSpacing: "-1px", color: ACCENT },
-  subtitle: { margin: 0, fontSize: 13, color: "#6B7A90", fontWeight: 700, letterSpacing: "0.3px" },
+  title: { margin: 0, fontSize: 28, fontWeight: 900, letterSpacing: "-1px", color: ACCENT },
+  subtitle: { margin: 0, fontSize: 13, color: MUTED, fontWeight: 700, letterSpacing: "0.3px" },
 
-  langSelectWrap: { position: "relative", display: "flex", alignItems: "center", background: "#fff", border: "2px solid #DCEFF1", borderRadius: 999, padding: "0 34px 0 12px", boxShadow: "0 2px 8px rgba(0,120,130,0.06)" },
-  langGlobe: { fontSize: 16, marginRight: 6 },
+  langSelectWrap: { position: "relative", display: "flex", alignItems: "center", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: "0 34px 0 12px" },
+  langGlobe: { marginRight: 6 },
   langSelect: { appearance: "none", WebkitAppearance: "none", MozAppearance: "none", border: "none", background: "transparent", color: INK, fontFamily: "inherit", fontWeight: 800, fontSize: 15, padding: "10px 4px", cursor: "pointer", outline: "none" },
   langCaret: { position: "absolute", right: 14, color: ACCENT, fontSize: 12, fontWeight: 900, pointerEvents: "none" },
 
-  sentenceBar: { display: "flex", alignItems: "center", gap: 10, background: "#fff", border: "2px solid #E1F1F3", borderRadius: 18, padding: 12, marginBottom: 14, boxShadow: "0 4px 16px rgba(0,120,130,0.07)" },
+  sentenceBar: { display: "flex", alignItems: "center", gap: 10, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 12, marginBottom: 14, boxShadow: CARD_SHADOW },
   sentenceScroll: { flex: 1, display: "flex", gap: 8, overflowX: "auto", minHeight: 64, alignItems: "center" },
-  placeholder: { color: "#A6AFBD", fontWeight: 600, fontSize: 15, paddingLeft: 6 },
-  sentChip: { display: "flex", flexDirection: "column", alignItems: "center", background: "#EAF9FB", borderRadius: 12, padding: "6px 12px", minWidth: 62 },
-  sentGlyph: { fontSize: 26, lineHeight: 1 },
+  placeholder: { color: "#9CA3AF", fontWeight: 600, fontSize: 15, paddingLeft: 6 },
+  sentChip: { display: "flex", flexDirection: "column", alignItems: "center", background: PAPER, borderRadius: 8, padding: "6px 12px", minWidth: 62 },
   sentWord: { fontSize: 13, fontWeight: 800, marginTop: 2, whiteSpace: "nowrap" },
   sentActions: { display: "flex", gap: 6, alignItems: "center" },
-  iconBtn: { width: 44, height: 44, borderRadius: 12, border: "2px solid #E1F1F3", background: "#fff", fontSize: 18 },
-  speakBtn: { height: 44, padding: "0 18px", borderRadius: 12, border: "none", background: `linear-gradient(135deg, ${ACCENT2}, ${ACCENT})`, color: "#fff", fontWeight: 800, fontSize: 16, boxShadow: "0 4px 12px rgba(0,166,166,0.35)" },
+  iconBtn: { width: 44, height: 44, borderRadius: 8, border: `1px solid ${LINE}`, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" },
+  speakBtn: { display: "flex", alignItems: "center", height: 44, padding: "0 20px", borderRadius: 8, border: "none", background: TEAL, color: "#fff", fontWeight: 800, fontSize: 16, boxShadow: "0 4px 10px rgba(15,118,110,0.30)" },
 
   predSection: { marginBottom: 16 },
   predHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
-  predLabel: { fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: "#6B7A90", display: "flex", alignItems: "center", gap: 6 },
-  infoBtn: { width: 20, height: 20, borderRadius: 999, border: "none", background: "#CFEAEC", color: ACCENT, fontSize: 12, fontWeight: 900, lineHeight: 1 },
-  infoBox: { background: "#EAF9FB", border: "1px solid #BEE7EA", borderRadius: 12, padding: "10px 14px", fontSize: 13, color: "#3A4A5E", marginBottom: 10, lineHeight: 1.5 },
-  todTag: { fontSize: 13, fontWeight: 700, color: ACCENT, background: "#E0F7F8", padding: "4px 10px", borderRadius: 999 },
+  predLabel: { fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED, display: "flex", alignItems: "center", gap: 6 },
+  infoBtn: { width: 20, height: 20, borderRadius: 6, border: "none", background: "#DBEAFE", color: ACCENT, fontSize: 12, fontWeight: 900, lineHeight: 1 },
+  infoBox: { background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#1E3A8A", marginBottom: 10, lineHeight: 1.5 },
+  todTag: { display: "flex", alignItems: "center", fontSize: 13, fontWeight: 700, color: TEAL, background: "#CCFBF1", padding: "4px 10px", borderRadius: 6 },
   predRow: { display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 },
-  predTile: { display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "14px 6px", borderRadius: 16, border: "2px dashed " + ACCENT, background: "linear-gradient(180deg, #F0FCFD, #E2F8FA)", transition: "transform 0.08s", boxShadow: "0 4px 12px rgba(0,166,166,0.10)" },
-  predGlyph: { fontSize: 30 },
-  predWord: { fontSize: 14, fontWeight: 800, textAlign: "center" },
+  predTile: { display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "14px 6px", borderRadius: 8, border: `1.5px dashed ${ACCENT}`, background: "#EFF6FF", transition: "transform 0.08s" },
+  predWord: { fontSize: 14, fontWeight: 800, textAlign: "center", color: INK },
 
   catRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 },
-  catChip: { padding: "7px 14px", borderRadius: 999, border: "2px solid #DCEFF1", background: "#fff", fontWeight: 700, fontSize: 14, color: INK },
+  catChip: { padding: "7px 14px", borderRadius: 6, border: `1px solid ${LINE}`, background: "#fff", fontWeight: 700, fontSize: 14, color: INK },
   catChipActive: { background: ACCENT, color: "#fff", borderColor: ACCENT },
 
   board: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(108px, 1fr))", gap: 10, marginBottom: 22 },
-  tile: { position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "16px 6px 12px", borderRadius: 18, border: "2px solid", background: "#fff", overflow: "hidden", transition: "transform 0.08s", boxShadow: "0 4px 14px rgba(0,120,130,0.08)" },
-  tileBar: { position: "absolute", top: 0, left: 0, right: 0, height: 6 },
-  tileGlyph: { fontSize: 38, lineHeight: 1, marginTop: 4 },
-  tileWord: { fontSize: 16, fontWeight: 800, textAlign: "center", marginTop: 4 },
-  tileEn: { fontSize: 11, color: "#9AA4B2", fontWeight: 600 },
+  tile: { position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: "18px 6px 12px", borderRadius: 8, border: `1px solid ${LINE}`, background: "#fff", overflow: "hidden", transition: "transform 0.08s", boxShadow: CARD_SHADOW },
+  tileBar: { position: "absolute", top: 0, left: 0, right: 0, height: 5 },
+  tileGlyph: { marginTop: 2 },
+  tileWord: { fontSize: 16, fontWeight: 800, textAlign: "center", marginTop: 6, color: INK },
+  tileEn: { fontSize: 11, color: "#9CA3AF", fontWeight: 600 },
 
-  footer: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, background: "#fff", border: "2px solid #E1F1F3", borderRadius: 18, padding: 16, boxShadow: "0 4px 16px rgba(0,120,130,0.06)" },
+  footer: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 16, boxShadow: CARD_SHADOW },
   footBlock: { display: "flex", flexDirection: "column", gap: 8 },
-  footLabel: { fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: "#6B7A90" },
+  footLabel: { fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED },
   slider: { width: "100%", accentColor: ACCENT },
   footValue: { fontSize: 14, fontWeight: 700, color: ACCENT },
-  freqRow: { display: "flex", gap: 6, flexWrap: "wrap" },
-  freqPill: { background: "#EAF9FB", borderRadius: 999, padding: "4px 10px", fontSize: 14, fontWeight: 700 },
-  freqEmpty: { color: "#A6AFBD", fontSize: 14, fontWeight: 600 },
+  freqRow: { display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" },
+  freqPill: { display: "flex", alignItems: "center", background: PAPER, borderRadius: 6, padding: "4px 10px", fontSize: 14, fontWeight: 700 },
+  freqEmpty: { color: "#9CA3AF", fontSize: 14, fontWeight: 600 },
 };
