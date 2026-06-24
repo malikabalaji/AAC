@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Voice Diagnostic</title>
+  <style>
+    body { font-family: -apple-system, system-ui, sans-serif; margin: 24px; color: #1f2937; }
+    h1 { font-size: 20px; }
+    .count { font-size: 16px; font-weight: 700; margin: 8px 0 16px; }
+    table { border-collapse: collapse; width: 100%; max-width: 720px; }
+    td, th { border: 1px solid #e5e7eb; padding: 6px 10px; font-size: 14px; text-align: left; }
+    tr.indic { background: #ecfdf5; font-weight: 700; }
+    button { font-size: 15px; padding: 8px 16px; margin: 4px; border-radius: 8px; border: 1px solid #2563eb; background: #2563eb; color: #fff; cursor: pointer; }
+    .test { margin: 16px 0; }
+  </style>
+</head>
+<body>
+  <h1>🔊 Browser Voice Diagnostic</h1>
+  <div class="count" id="count">Loading voices…</div>
+
+  <div class="test">
+    <strong>Test speech:</strong><br>
+    <button onclick="test('ta-IN','வணக்கம், என் பெயர் வாணி')">Speak Tamil</button>
+    <button onclick="test('te-IN','నమస్తే')">Telugu</button>
+    <button onclick="test('hi-IN','नमस्ते')">Hindi</button>
+    <button onclick="test('en-IN','Hello')">English</button>
+  </div>
+
+  <table id="tbl"><thead><tr><th>#</th><th>name</th><th>lang</th><th>localService</th></tr></thead><tbody></tbody></table>
+
+  <script>
+    function render() {
+      const voices = speechSynthesis.getVoices();
+      const indic = voices.filter(v => /^(ta|te|bn|mr|kn|gu|ml|or|hi)\b/i.test(v.lang.replace('_','-')));
+      document.getElementById('count').innerHTML =
+        'Total voices: <b>' + voices.length + '</b> &nbsp;|&nbsp; Indic voices found: <b>' +
+        indic.length + '</b>' + (indic.length ? ' → ' + indic.map(v => v.lang).join(', ') : '');
+      const tb = document.querySelector('#tbl tbody');
+      tb.innerHTML = '';
+      voices.forEach((v, i) => {
+        const tr = document.createElement('tr');
+        if (/^(ta|te|bn|mr|kn|gu|ml|or|hi)\b/i.test(v.lang.replace('_','-'))) tr.className = 'indic';
+        tr.innerHTML = `<td>${i}</td><td>${v.name}</td><td>${v.lang}</td><td>${v.localService}</td>`;
+        tb.appendChild(tr);
+      });
+    }
+    function test(lang, text) {
+      speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      const v = speechSynthesis.getVoices().find(x => x.lang.replace('_','-').toLowerCase().startsWith(lang.toLowerCase()));
+      if (v) { u.voice = v; u.lang = v.lang; alert('Using voice: ' + v.name + ' (' + v.lang + ')'); }
+      else { u.lang = lang; alert('No matching voice found for ' + lang + ' — browser will use default/none.'); }
+      speechSynthesis.speak(u);
+    }
+    render();
+    speechSynthesis.onvoiceschanged = render;
+    setTimeout(render, 500);
+  </script>
+</body>
+</html>

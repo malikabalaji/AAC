@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sira · Tap. Talk. Connect.</title>
+  <!-- All assets are local — the app runs fully offline. -->
+  <link href="fonts/space-grotesk.css" rel="stylesheet">
+  <script src="vendor/react.production.min.js"></script>
+  <script src="vendor/react-dom.production.min.js"></script>
+  <script src="vendor/babel.min.js"></script>
+  <style>html, body { margin: 0; }</style>
+</head>
+<body>
+  <div id="root">Loading…</div>
+  <script>
+    // Load the JSX component, compile it in the browser, and render it.
+    fetch('AAC.jsx')
+      .then((r) => r.text())
+      .then((src) => {
+        // Adapt the ES-module component for in-browser (UMD) React:
+        // drop every `import ...` line and the `export default` keyword.
+        src = src
+          .split('\n')
+          .filter((line) => !/^\s*import\b/.test(line))
+          .join('\n')
+          .replace(/export\s+default\s+/, '');
+        src = 'const { useState, useEffect, useMemo, useRef } = React;\n' + src;
+        const code = Babel.transform(src, {
+          presets: [['react', { runtime: 'classic' }]],
+          sourceType: 'script',
+        }).code;
+        new Function('React', 'ReactDOM', code +
+          '\nReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));'
+        )(React, ReactDOM);
+      })
+      .catch((e) => {
+        document.getElementById('root').textContent = 'Failed to load AAC.jsx: ' + e;
+      });
+  </script>
+</body>
+</html>

@@ -74,9 +74,7 @@ const LANGUAGES = {
   te: { label: "Telugu",  native: "తెలుగు",  field: "te", flag: "🇮🇳", voice: ["te-IN", "te"] },
   bn: { label: "Bengali",   native: "বাংলা",    field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
   mr: { label: "Marathi",   native: "मराठी",    field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
-  gu: { label: "Gujarati",  native: "ગુજરાતી",  field: "gu", flag: "🇮🇳", voice: ["gu-IN", "gu"] },
   kn: { label: "Kannada",   native: "ಕನ್ನಡ",     field: "kn", flag: "🇮🇳", voice: ["kn-IN", "kn"] },
-  or: { label: "Odia",      native: "ଓଡ଼ିଆ",     field: "or", flag: "🇮🇳", voice: ["or-IN", "or"] },
   ml: { label: "Malayalam", native: "മലയാളം",   field: "ml", flag: "🇮🇳", voice: ["ml-IN", "ml"] },
 };
 
@@ -86,7 +84,7 @@ const LANGUAGES = {
    of relying on each device's native emoji font. An emoji string is converted
    to OpenMoji's hex-codepoint filename (variation selectors stripped, ZWJ kept).
 ---------------------------------------------------------------------------- */
-const OPENMOJI_BASE = "https://cdn.jsdelivr.net/npm/openmoji@15.0.0/color/svg/";
+const OPENMOJI_BASE = "icons/"; // local OpenMoji SVGs, bundled for offline use
 
 function openmojiUrl(emoji) {
   const cps = [];
@@ -268,30 +266,71 @@ function topPredictions(scores, n, exclude) {
    5. SPEECH
 ---------------------------------------------------------------------------- */
 function useVoices() {
-  const [voices, setVoices] = useState([]);
+  const [voices, setVoices] = useState(() => window.speechSynthesis?.getVoices() || []);
   useEffect(() => {
-    const load = () => setVoices(window.speechSynthesis?.getVoices() || []);
+    if (!window.speechSynthesis) return;
+    const load = () => {
+      const v = window.speechSynthesis.getVoices() || [];
+      if (v.length) setVoices(v);
+    };
     load();
-    if (window.speechSynthesis) window.speechSynthesis.onvoiceschanged = load;
+    window.speechSynthesis.onvoiceschanged = load;
+    // Some browsers populate the voice list late (or only after a newly
+    // installed voice registers) — poll a few times so we don't miss it.
+    let tries = 0;
+    const id = setInterval(() => {
+      load();
+      if (++tries > 12) clearInterval(id);
+    }, 300);
+    return () => {
+      clearInterval(id);
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, []);
   return voices;
 }
 
-function speak(text, langKey, voices) {
+// Always work off the freshest voice list available, merging the live
+// getVoices() result with whatever React state we were handed.
+function liveVoices(voices) {
+  const live = window.speechSynthesis?.getVoices() || [];
+  return live.length >= (voices?.length || 0) ? live : voices;
+}
+
+// Find the best installed voice for a language, or null if none exists.
+// Matches on region tag first (ta-IN), then the base language (ta), and
+// normalises underscores so "ta_IN" / "ta-IN" both match.
+function pickVoice(langKey, voices) {
+  const list = liveVoices(voices);
+  const norm = (s) => (s || "").toLowerCase().replace(/_/g, "-");
+  const prefs = LANGUAGES[langKey].voice;
+  for (const p of prefs) {
+    const v = list.find((v) => norm(v.lang).startsWith(norm(p)));
+    if (v) return v;
+  }
+  return null;
+}
+
+// Speak via the browser's Web Speech API (used as a fallback).
+function browserSpeak(text, langKey, voices) {
   if (!window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text);
-  const prefs = LANGUAGES[langKey].voice;
-  let chosen = null;
-  for (const p of prefs) {
-    chosen = voices.find((v) => v.lang?.toLowerCase().startsWith(p.toLowerCase()));
-    if (chosen) break;
-  }
+  const chosen = pickVoice(langKey, voices);
   if (chosen) { u.voice = chosen; u.lang = chosen.lang; }
-  else { u.lang = prefs[0]; }
+  else { u.lang = LANGUAGES[langKey].voice[0]; } // no installed voice — browser may stay silent
   u.rate = 0.85;
   u.pitch = 1.25; // child-like
   window.speechSynthesis.speak(u);
+}
+
+// Speak. Prefer the local Mac `say` bridge (serve.py) when it's reachable —
+// it reliably uses installed system voices — and fall back to the browser.
+function speak(text, langKey, voices) {
+  fetch("/say?lang=" + langKey + "&text=" + encodeURIComponent(text))
+    .then((r) => (r.ok ? r.json() : Promise.reject()))
+    .then((d) => { if (!d.ok) browserSpeak(text, langKey, voices); })
+    .catch(() => browserSpeak(text, langKey, voices));
 }
 
 /* ----------------------------------------------------------------------------
@@ -314,6 +353,21 @@ export default function App() {
 
   const field = LANGUAGES[lang].field;
   const tod = timeOfDay(simHour);
+
+  // Languages the local Mac `say` bridge (serve.py) can speak, if reachable.
+  const [serverLangs, setServerLangs] = useState(null);
+  useEffect(() => {
+    fetch("/sayvoices")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d && Array.isArray(d.langs)) setServerLangs(d.langs); })
+      .catch(() => {});
+  }, []);
+
+  // Can the current language be spoken — by the Mac bridge or a browser voice?
+  const voiceReady = useMemo(() => {
+    if (serverLangs) return serverLangs.includes(lang) || !!pickVoice(lang, voices);
+    return voices.length === 0 || !!pickVoice(lang, voices);
+  }, [lang, voices, serverLangs]);
 
   // live prediction
   const predictions = useMemo(() => {
@@ -425,6 +479,18 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* Voice-not-installed notice */}
+      {!voiceReady && (
+        <div style={st.voiceWarn}>
+          <Om ch="🔇" size={18} style={{ marginRight: 8, flexShrink: 0 }} />
+          <span>
+            No <b>{LANGUAGES[lang].label}</b> speech voice is installed on this device, so taps won’t be
+            spoken aloud. Symbols and text still work. On Mac: <b>System Settings → Accessibility → Spoken
+            Content → System Voice → Manage Voices</b>, then download {LANGUAGES[lang].label}.
+          </span>
+        </div>
+      )}
 
       {/* "My name" overlay — for when someone asks the child their name */}
       {showName && (
@@ -622,7 +688,7 @@ const st = {
   nameInput: { width: "100%", boxSizing: "border-box", padding: "12px 14px", fontSize: 16, fontWeight: 700, fontFamily: "inherit", color: INK, background: "#fff", border: `1.5px solid ${LINE}`, borderRadius: 8, outline: "none" },
 
   pickerTitle: { margin: "0 0 22px", fontSize: 40, fontWeight: 700, color: INK, letterSpacing: "-1px" },
-  pickerGrid: { display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 14, maxWidth: 800, margin: "0 auto" },
+  pickerGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, maxWidth: 680, margin: "0 auto" },
   pickerTile: {
     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
     minHeight: 96, padding: "16px 8px", borderRadius: 10, border: `1.5px solid ${LINE}`,
@@ -631,6 +697,8 @@ const st = {
   pickerNative: { fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.15 },
   pickerLabel: { fontSize: 13, fontWeight: 500, color: MUTED, letterSpacing: "0.2px" },
   pickerHint: { margin: "26px 0 0", fontSize: 13, color: "#9CA3AF", fontWeight: 600 },
+
+  voiceWarn: { display: "flex", alignItems: "flex-start", gap: 2, background: "#FFFBEB", border: "1.5px solid #FDE68A", color: "#92400E", borderRadius: 8, padding: "10px 14px", marginBottom: 14, fontSize: 13.5, fontWeight: 600, lineHeight: 1.45 },
 
   /* Header name chip + "my name" overlay */
   headerRight: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" },
