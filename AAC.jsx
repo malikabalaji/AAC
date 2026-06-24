@@ -35,36 +35,40 @@ const SYMBOLS = [
   { id: "stop",    glyph: "✋", cat: "actions", en: "stop",   ta: "நிறுத்து", te: "ఆపు",      hi: "रुको",  bn: "থামো",   mr: "थांब",  gu: "રોકો",   kn: "ನಿಲ್ಲಿಸು", or: "ଅଟକ",    ml: "നിർത്തുക" },
   { id: "more",    glyph: "➕", cat: "actions", en: "more",   ta: "மேலும்",   te: "ఇంకా",     hi: "और",    bn: "আরও",    mr: "अजून",  gu: "વધારે",  kn: "ಇನ್ನೂ",   or: "ଅଧିକ",   ml: "കൂടുതൽ" },
   { id: "help",    glyph: "🆘", cat: "actions", en: "help",   ta: "உதவி",     te: "సహాయం",   hi: "मदद",   bn: "সাহায্য",  mr: "मदत",   gu: "મદદ",    kn: "ಸಹಾಯ",    or: "ସାହାଯ୍ୟ",  ml: "സഹായം" },
-  // Objects
-  { id: "water",   glyph: "💧", cat: "objects", en: "water",  ta: "தண்ணீர்",  te: "నీళ్ళు",   hi: "पानी",  bn: "জল",     mr: "पाणी",  gu: "પાણી",   kn: "ನೀರು",    or: "ପାଣି",    ml: "വെള്ളം" },
-  { id: "food",    glyph: "🍚", cat: "objects", en: "food",   ta: "உணவு",     te: "అన్నం",    hi: "खाना",  bn: "খাবার",  mr: "जेवण",  gu: "ખોરાક",  kn: "ಆಹಾರ",    or: "ଖାଦ୍ୟ",   ml: "ഭക്ഷണം" },
-  { id: "milk",    glyph: "🥛", cat: "objects", en: "milk",   ta: "பால்",     te: "పాలు",     hi: "दूध",   bn: "দুধ",     mr: "दूध",   gu: "દૂધ",    kn: "ಹಾಲು",    or: "ଦୁଧ",     ml: "പാൽ" },
-  { id: "toilet",  glyph: "🚽", cat: "objects", en: "toilet", ta: "கழிப்பறை", te: "టాయిలెట్", hi: "टॉयलेट", bn: "টয়লেট",  mr: "टॉयलेट", gu: "ટોઇલેટ",  kn: "ಟಾಯ್ಲೆಟ್", or: "ଟଏଲେଟ୍",  ml: "ടോയ്‌ലറ്റ്" },
-  { id: "school",  glyph: "🏫", cat: "objects", en: "school", ta: "பள்ளி",    te: "స్కూల్",   hi: "स्कूल",  bn: "স্কুল",   mr: "शाळा",  gu: "શાળા",   kn: "ಶಾಲೆ",    or: "ସ୍କୁଲ୍",   ml: "സ്കൂൾ" },
-  { id: "home",    glyph: "🏠", cat: "objects", en: "home",   ta: "வீடு",     te: "ఇల్లు",    hi: "घर",    bn: "বাড়ি",   mr: "घर",    gu: "ઘર",     kn: "ಮನೆ",     or: "ଘର",     ml: "വീട്" },
-  { id: "toy",     glyph: "🪀", cat: "objects", en: "toy",    ta: "பொம்மை",   te: "ఆటబొమ్మ",  hi: "खिलौना", bn: "খেলনা",  mr: "खेळणं", gu: "રમકડું",  kn: "ಆಟಿಕೆ",   or: "ଖେଳନା",   ml: "കളിപ്പാട്ടം" },
-  { id: "book",    glyph: "📖", cat: "objects", en: "book",   ta: "புத்தகம்", te: "పుస్తకం",  hi: "किताब", bn: "বই",     mr: "पुस्तक", gu: "પુસ્તક",  kn: "ಪುಸ್ತಕ",   or: "ବହି",     ml: "പുസ്തകം" },
+  // Food & Drink
+  { id: "water",   glyph: "💧", cat: "food",    en: "water",  ta: "தண்ணீர்",  te: "నీళ్ళు",   hi: "पानी",  bn: "জল",     mr: "पाणी",  gu: "પાણી",   kn: "ನೀರು",    or: "ପାଣି",    ml: "വെള്ളം" },
+  { id: "food",    glyph: "🍚", cat: "food",    en: "food",   ta: "உணவு",     te: "అన్నం",    hi: "खाना",  bn: "খাবার",  mr: "जेवण",  gu: "ખોરાક",  kn: "ಆಹಾರ",    or: "ଖାଦ୍ୟ",   ml: "ഭക്ഷണം" },
+  { id: "milk",    glyph: "🥛", cat: "food",    en: "milk",   ta: "பால்",     te: "పాలు",     hi: "दूध",   bn: "দুধ",     mr: "दूध",   gu: "દૂધ",    kn: "ಹಾಲು",    or: "ଦୁଧ",     ml: "പാൽ" },
+  // Places
+  { id: "toilet",  glyph: "🚽", cat: "places",  en: "toilet", ta: "கழிப்பறை", te: "టాయిలెట్", hi: "टॉयलेट", bn: "টয়লেট",  mr: "टॉयलेट", gu: "ટોઇલેટ",  kn: "ಟಾಯ್ಲೆಟ್", or: "ଟଏଲେଟ୍",  ml: "ടോയ്‌ലറ്റ്" },
+  { id: "school",  glyph: "🏫", cat: "places",  en: "school", ta: "பள்ளி",    te: "స్కూల్",   hi: "स्कूल",  bn: "স্কুল",   mr: "शाळा",  gu: "શાળા",   kn: "ಶಾಲೆ",    or: "ସ୍କୁଲ୍",   ml: "സ്കൂൾ" },
+  { id: "home",    glyph: "🏠", cat: "places",  en: "home",   ta: "வீடு",     te: "ఇల్లు",    hi: "घर",    bn: "বাড়ি",   mr: "घर",    gu: "ઘર",     kn: "ಮನೆ",     or: "ଘର",     ml: "വീട്" },
+  // Things
+  { id: "toy",     glyph: "🪀", cat: "things",  en: "toy",    ta: "பொம்மை",   te: "ఆటబొమ్మ",  hi: "खिलौना", bn: "খেলনা",  mr: "खेळणं", gu: "રમકડું",  kn: "ಆಟಿಕೆ",   or: "ଖେଳନା",   ml: "കളിപ്പാട്ടം" },
+  { id: "book",    glyph: "📖", cat: "things",  en: "book",   ta: "புத்தகம்", te: "పుస్తకం",  hi: "किताब", bn: "বই",     mr: "पुस्तक", gu: "પુસ્તક",  kn: "ಪುಸ್ತಕ",   or: "ବହି",     ml: "പുസ്തകം" },
   // Feelings
   { id: "happy",   glyph: "😊", cat: "feelings", en: "happy", ta: "மகிழ்ச்சி", te: "సంతోషం",  hi: "खुश",   bn: "খুশি",   mr: "आनंदी", gu: "ખુશ",    kn: "ಸಂತೋಷ",   or: "ଖୁସି",    ml: "സന്തോഷം" },
   { id: "sad",     glyph: "😢", cat: "feelings", en: "sad",   ta: "சோகம்",    te: "బాధ",      hi: "दुखी",  bn: "দুঃখ",   mr: "दुःखी", gu: "ઉદાસ",   kn: "ದುಃಖ",    or: "ଦୁଃଖ",    ml: "സങ്കടം" },
   { id: "hungry",  glyph: "🤤", cat: "feelings", en: "hungry", ta: "பசி",     te: "ఆకలి",     hi: "भूख",   bn: "ক্ষুধা",  mr: "भूक",   gu: "ભૂખ",    kn: "ಹಸಿವು",   or: "ଭୋକ",    ml: "വിശപ്പ്" },
   { id: "tired",   glyph: "🥱", cat: "feelings", en: "tired", ta: "சோர்வு",   te: "అలసట",     hi: "थका",   bn: "ক্লান্ত",  mr: "थकलो",  gu: "થાક",    kn: "ಸುಸ್ತು",   or: "ଥକା",    ml: "ക്ഷീണം" },
   { id: "pain",    glyph: "🤕", cat: "feelings", en: "pain",  ta: "வலி",      te: "నొప్పి",   hi: "दर्द",  bn: "ব্যথা",   mr: "वेदना", gu: "દુખાવો",  kn: "ನೋವು",    or: "ବ୍ୟଥା",   ml: "വേദന" },
-  // Social
-  { id: "yes",     glyph: "✅", cat: "social",  en: "yes",    ta: "ஆம்",      te: "అవును",    hi: "हाँ",   bn: "হ্যাঁ",   mr: "हो",    gu: "હા",     kn: "ಹೌದು",    or: "ହଁ",     ml: "അതെ" },
-  { id: "no",      glyph: "❌", cat: "social",  en: "no",     ta: "இல்லை",    te: "కాదు",     hi: "नहीं",  bn: "না",     mr: "नाही",  gu: "ના",     kn: "ಇಲ್ಲ",    or: "ନା",     ml: "അല്ല" },
-  { id: "thanks",  glyph: "🙏", cat: "social",  en: "thank you", ta: "நன்றி", te: "ధన్యవాదాలు", hi: "धन्यवाद", bn: "ধন্যবাদ", mr: "धन्यवाद", gu: "આભાર",   kn: "ಧನ್ಯವಾದ",  or: "ଧନ୍ୟବାଦ",  ml: "നന്ദി" },
-  { id: "hello",   glyph: "👋", cat: "social",  en: "hello",  ta: "வணக்கம்",  te: "నమస్తే",   hi: "नमस्ते", bn: "নমস্কার", mr: "नमस्कार", gu: "નમસ્તે",  kn: "ನಮಸ್ಕಾರ",  or: "ନମସ୍କାର",  ml: "നമസ്കാരം" },
+  // Quick words
+  { id: "yes",     glyph: "✅", cat: "quick",   en: "yes",    ta: "ஆம்",      te: "అవును",    hi: "हाँ",   bn: "হ্যাঁ",   mr: "हो",    gu: "હા",     kn: "ಹೌದು",    or: "ହଁ",     ml: "അതെ" },
+  { id: "no",      glyph: "❌", cat: "quick",   en: "no",     ta: "இல்லை",    te: "కాదు",     hi: "नहीं",  bn: "না",     mr: "नाही",  gu: "ના",     kn: "ಇಲ್ಲ",    or: "ନା",     ml: "അല്ല" },
+  { id: "thanks",  glyph: "🙏", cat: "quick",   en: "thank you", ta: "நன்றி", te: "ధన్యవాదాలు", hi: "धन्यवाद", bn: "ধন্যবাদ", mr: "धन्यवाद", gu: "આભાર",   kn: "ಧನ್ಯವಾದ",  or: "ଧନ୍ୟବାଦ",  ml: "നന്ദി" },
+  { id: "hello",   glyph: "👋", cat: "quick",   en: "hello",  ta: "வணக்கம்",  te: "నమస్తే",   hi: "नमस्ते", bn: "নমস্কার", mr: "नमस्कार", gu: "નમસ્તે",  kn: "ನಮಸ್ಕಾರ",  or: "ନମସ୍କାର",  ml: "നമസ്കാരം" },
 ];
 
 const SYMBOL_BY_ID = Object.fromEntries(SYMBOLS.map((s) => [s.id, s]));
 
 const CATEGORIES = {
-  people:   { label: "People",   color: "#2563EB" }, // deep blue  — primary
-  actions:  { label: "Actions",  color: "#0F766E" }, // teal       — communication
-  objects:  { label: "Things",   color: "#D97706" }, // amber      — attention
-  feelings: { label: "Feelings", color: "#7C3AED" }, // purple     — emotions
-  social:   { label: "Social",   color: "#7C3AED" }, // purple     — social
+  people:   { label: "People",       color: "#2563EB" }, // blue
+  actions:  { label: "Actions",      color: "#0F766E" }, // teal
+  food:     { label: "Food & Drink", color: "#D97706" }, // amber
+  places:   { label: "Places",       color: "#0EA5E9" }, // sky
+  things:   { label: "Things",       color: "#7C3AED" }, // purple
+  feelings: { label: "Feelings",     color: "#DB2777" }, // pink
+  quick:    { label: "Quick Words",  color: "#16A34A" }, // green
 };
 
 const LANGUAGES = {
@@ -236,17 +240,21 @@ function timeOfDay(hour) {
   return "night";
 }
 
-function rerank(rawScores, { tod, recent, personalFreq }) {
+function rerank(rawScores, { tod, recent, personalFreq, todFreq }) {
   const out = {};
   const recentSet = new Set(recent.slice(-4));
-  const timeMap = TIME_BOOSTS[tod] || {};
+  const timeMap = TIME_BOOSTS[tod] || {};                       // built-in time priors
   const personalTotal = Object.values(personalFreq).reduce((a, b) => a + b, 0) || 1;
+  const todMap = (todFreq && todFreq[tod]) || {};               // learned: this child, this time
+  const todTotal = Object.values(todMap).reduce((a, b) => a + b, 0) || 1;
   for (const [tok, base] of Object.entries(rawScores)) {
     let s = base;
-    if (timeMap[tok]) s *= timeMap[tok];                       // time of day
-    if (recentSet.has(tok)) s *= 1.25;                         // recency
-    const pf = (personalFreq[tok] || 0) / personalTotal;       // personalization
+    if (timeMap[tok]) s *= timeMap[tok];                        // time-of-day priors
+    if (recentSet.has(tok)) s *= 1.25;                          // recency
+    const pf = (personalFreq[tok] || 0) / personalTotal;        // overall personalization
     s *= 1 + pf * 2.5;
+    const tf = (todMap[tok] || 0) / todTotal;                   // what they usually ask now
+    s *= 1 + tf * 3.0;
     out[tok] = s;
   }
   return out;
@@ -333,7 +341,38 @@ function speak(text, langKey, voices) {
 }
 
 /* ----------------------------------------------------------------------------
-   6. APP
+   6. PERSISTENCE + SOS DEFAULTS
+   The child's learned usage, name, and the guardian's emergency phrases are
+   saved in the browser so they survive across sessions and work offline.
+---------------------------------------------------------------------------- */
+function usePersistentState(key, initial) {
+  const [value, setValue] = useState(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw != null ? JSON.parse(raw) : initial;
+    } catch {
+      return initial;
+    }
+  });
+  useEffect(() => {
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch {}
+  }, [key, value]);
+  return [value, setValue];
+}
+
+// Default emergency phrases. A guardian can edit, translate, add, or remove
+// these in the SOS setup. Each carries the language it should be spoken in.
+const DEFAULT_SOS = [
+  { text: "I need help!",              lang: "en" },
+  { text: "Please call my mother.",    lang: "en" },
+  { text: "I am in pain.",             lang: "en" },
+  { text: "I need the toilet.",        lang: "en" },
+  { text: "Please take me home.",      lang: "en" },
+  { text: "Call a doctor.",            lang: "en" },
+];
+
+/* ----------------------------------------------------------------------------
+   7. APP
 ---------------------------------------------------------------------------- */
 export default function App() {
   const model = useMemo(() => buildNgramModel(CORPUS), []);
@@ -341,14 +380,20 @@ export default function App() {
 
   const [lang, setLang] = useState("en");
   const [langChosen, setLangChosen] = useState(false); // show picker until a language is chosen
-  const [childName, setChildName] = useState("");      // child's name, entered on the landing page
+  const [childName, setChildName] = usePersistentState("sira.name", ""); // saved across visits
   const [showName, setShowName] = useState(false);     // big "my name" overlay
   const [sentence, setSentence] = useState([]);      // array of symbol ids
-  const [personalFreq, setPersonalFreq] = useState({});
+  const [personalFreq, setPersonalFreq] = usePersistentState("sira.freq", {});      // overall usage
+  const [todFreq, setTodFreq] = usePersistentState("sira.todFreq", {});             // usage per time of day
   const [recent, setRecent] = useState([]);
   const [simHour, setSimHour] = useState(new Date().getHours());
   const [activeCat, setActiveCat] = useState("all");
   const [showPredInfo, setShowPredInfo] = useState(false);
+
+  // SOS (emergency phrases, set up by a guardian — saved on the device)
+  const [sosPhrases, setSosPhrases] = usePersistentState("sira.sos", DEFAULT_SOS);
+  const [showSOS, setShowSOS] = useState(false);
+  const [sosEdit, setSosEdit] = useState(false);
 
   const field = LANGUAGES[lang].field;
   const tod = timeOfDay(simHour);
@@ -368,20 +413,30 @@ export default function App() {
     return voices.length === 0 || !!pickVoice(lang, voices);
   }, [lang, voices, serverLangs]);
 
-  // live prediction
+  // live prediction — n-gram, re-ranked by time-of-day priors, recency,
+  // overall usage, and what this child usually asks at this time of day.
   const predictions = useMemo(() => {
     const raw = ngramScores(model, sentence);
-    const ranked = rerank(raw, { tod, recent, personalFreq });
+    const ranked = rerank(raw, { tod, recent, personalFreq, todFreq });
     return topPredictions(ranked, 6, sentence.slice(-1));
-  }, [model, sentence, tod, recent, personalFreq]);
+  }, [model, sentence, tod, recent, personalFreq, todFreq]);
 
   const addSymbol = (id) => {
     setSentence((s) => [...s, id]);
     setRecent((r) => [...r, id].slice(-12));
     setPersonalFreq((f) => ({ ...f, [id]: (f[id] || 0) + 1 }));
+    // learn what they ask at this time of day
+    setTodFreq((tf) => {
+      const bucket = { ...(tf[tod] || {}) };
+      bucket[id] = (bucket[id] || 0) + 1;
+      return { ...tf, [tod]: bucket };
+    });
     const sym = SYMBOL_BY_ID[id];
     if (sym) speak(sym[field], lang, voices); // speak each tapped word
   };
+
+  // Speak an emergency phrase (and keep the SOS panel open).
+  const speakSos = (phrase) => speak(phrase.text, phrase.lang || lang, voices);
 
   const speakSentence = () => {
     if (!sentence.length) return;
@@ -450,6 +505,15 @@ export default function App() {
           </div>
         </div>
         <div style={st.headerRight}>
+          <button
+            style={st.sosBtn}
+            className="sos-btn"
+            onClick={() => { setShowSOS(true); setSosEdit(false); }}
+            title="Emergency"
+          >
+            <Om ch="🆘" size={20} style={{ marginRight: 6 }} />
+            SOS
+          </button>
           {childName.trim() && (
             <button
               style={st.nameChip}
@@ -478,6 +542,84 @@ export default function App() {
           </div>
         </div>
       </header>
+
+      {/* SOS overlay — large emergency phrases; guardian can set them up */}
+      {showSOS && (
+        <div style={st.sosOverlay} onClick={() => setShowSOS(false)}>
+          <div style={st.sosCard} onClick={(e) => e.stopPropagation()}>
+            <div style={st.sosHead}>
+              <span style={st.sosTitle}><Om ch="🆘" size={26} style={{ marginRight: 8 }} /> Emergency</span>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button style={st.sosSetupBtn} onClick={() => setSosEdit((v) => !v)}>
+                  {sosEdit ? "Done" : "⚙ Guardian setup"}
+                </button>
+                <button style={st.sosCloseBtn} onClick={() => setShowSOS(false)}>✕</button>
+              </div>
+            </div>
+
+            {!sosEdit ? (
+              /* EMERGENCY MODE — tap a phrase to say it loudly */
+              <div style={st.sosGrid}>
+                {sosPhrases.length === 0 && (
+                  <p style={st.sosEmpty}>No phrases yet. Tap “Guardian setup” to add some.</p>
+                )}
+                {sosPhrases.map((p, i) => (
+                  <button key={i} style={st.sosPhrase} className="tile-press" onClick={() => speakSos(p)}>
+                    <Om ch="🔊" size={22} style={{ marginRight: 10, flexShrink: 0 }} />
+                    <span>{p.text}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              /* GUARDIAN SETUP — add / edit / remove phrases */
+              <div style={st.sosEditWrap}>
+                <p style={st.sosEditHint}>
+                  Add short emergency sentences. Pick the language each one should be spoken in.
+                </p>
+                {sosPhrases.map((p, i) => (
+                  <div key={i} style={st.sosEditRow}>
+                    <input
+                      style={st.sosEditInput}
+                      value={p.text}
+                      placeholder="Emergency sentence"
+                      onChange={(e) =>
+                        setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))
+                      }
+                    />
+                    <select
+                      style={st.sosEditSelect}
+                      value={p.lang || lang}
+                      onChange={(e) =>
+                        setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, lang: e.target.value } : x)))
+                      }
+                    >
+                      {Object.entries(LANGUAGES).map(([k, v]) => (
+                        <option key={k} value={k}>{v.label}</option>
+                      ))}
+                    </select>
+                    <button style={st.sosTestBtn} title="Test" onClick={() => speakSos(p)}>
+                      <Om ch="🔊" size={18} />
+                    </button>
+                    <button
+                      style={st.sosDelBtn}
+                      title="Remove"
+                      onClick={() => setSosPhrases((arr) => arr.filter((_, j) => j !== i))}
+                    >
+                      <Om ch="🗑️" size={18} />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  style={st.sosAddBtn}
+                  onClick={() => setSosPhrases((arr) => [...arr, { text: "", lang }])}
+                >
+                  ＋ Add phrase
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Voice-not-installed notice */}
       {!voiceReady && (
@@ -642,6 +784,7 @@ const INK     = "#374151"; // neutral text
 const MUTED   = "#6B7280"; // secondary text
 const LINE    = "#E5E7EB"; // hairline borders
 const PAPER   = "#F3F4F6"; // neutral gray background
+const SOS_RED = "#DC2626"; // emergency
 
 const globalCss = `
   * { box-sizing: border-box; }
@@ -650,6 +793,7 @@ const globalCss = `
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
   .tile-press:active { transform: scale(0.96); }
+  .sos-btn:hover { filter: brightness(1.06); }
   .lang-tile { transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
   .lang-tile:hover {
     border-color: ${ACCENT};
@@ -687,10 +831,10 @@ const st = {
   nameInput: { width: "100%", boxSizing: "border-box", padding: "12px 14px", fontSize: 16, fontWeight: 700, fontFamily: "inherit", color: INK, background: "#fff", border: `1.5px solid ${LINE}`, borderRadius: 8, outline: "none" },
 
   pickerTitle: { margin: "0 0 22px", fontSize: 40, fontWeight: 700, color: INK, letterSpacing: "-1px" },
-  pickerGrid: { display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 14, maxWidth: 680, margin: "0 auto" },
+  pickerGrid: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 14, maxWidth: 680, margin: "0 auto" },
   pickerTile: {
     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
-    minHeight: 96, padding: "16px 8px", borderRadius: 10, border: `1.5px solid ${LINE}`,
+    width: 150, minHeight: 96, padding: "16px 8px", borderRadius: 10, border: `1.5px solid ${LINE}`,
     background: "#fff",
   },
   pickerNative: { fontSize: 24, fontWeight: 700, color: INK, lineHeight: 1.15 },
@@ -710,6 +854,26 @@ const st = {
   nameOverlayActions: { display: "flex", gap: 10, justifyContent: "center", marginTop: 28 },
   nameOverlaySpeak: { display: "flex", alignItems: "center", height: 48, padding: "0 24px", borderRadius: 8, border: "none", background: TEAL, color: "#fff", fontWeight: 800, fontSize: 17, boxShadow: "0 4px 10px rgba(15,118,110,0.30)" },
   nameOverlayClose: { height: 48, padding: "0 24px", borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", color: INK, fontWeight: 800, fontSize: 17 },
+
+  /* SOS button + overlay */
+  sosBtn: { display: "flex", alignItems: "center", height: 40, padding: "0 16px", borderRadius: 8, border: "none", background: SOS_RED, color: "#fff", fontWeight: 900, fontSize: 16, letterSpacing: "0.5px", boxShadow: "0 4px 10px rgba(220,38,38,0.35)" },
+  sosOverlay: { position: "fixed", inset: 0, background: "rgba(127,29,29,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 60 },
+  sosCard: { background: "#fff", borderRadius: 12, padding: 20, width: "100%", maxWidth: 720, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 60px rgba(0,0,0,0.35)", borderTop: `6px solid ${SOS_RED}` },
+  sosHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  sosTitle: { display: "flex", alignItems: "center", fontSize: 24, fontWeight: 900, color: SOS_RED, letterSpacing: "-0.5px" },
+  sosSetupBtn: { height: 38, padding: "0 14px", borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", color: INK, fontWeight: 700, fontSize: 14 },
+  sosCloseBtn: { width: 38, height: 38, borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", color: INK, fontWeight: 900, fontSize: 16 },
+  sosGrid: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 },
+  sosEmpty: { gridColumn: "1 / -1", color: MUTED, fontWeight: 600, textAlign: "center", padding: "20px 0" },
+  sosPhrase: { display: "flex", alignItems: "center", textAlign: "left", padding: "20px 18px", borderRadius: 10, border: `2px solid ${SOS_RED}`, background: "#FEF2F2", color: "#7F1D1D", fontWeight: 800, fontSize: 19, lineHeight: 1.25 },
+  sosEditWrap: { display: "flex", flexDirection: "column", gap: 10 },
+  sosEditHint: { margin: 0, fontSize: 13.5, color: MUTED, fontWeight: 600 },
+  sosEditRow: { display: "flex", gap: 8, alignItems: "center" },
+  sosEditInput: { flex: 1, minWidth: 0, padding: "10px 12px", fontSize: 15, fontFamily: "inherit", fontWeight: 600, color: INK, border: `1.5px solid ${LINE}`, borderRadius: 8, outline: "none" },
+  sosEditSelect: { padding: "10px 8px", fontSize: 14, fontFamily: "inherit", fontWeight: 700, color: INK, border: `1.5px solid ${LINE}`, borderRadius: 8, background: "#fff" },
+  sosTestBtn: { width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" },
+  sosDelBtn: { width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: "1.5px solid #FECACA", background: "#FEF2F2", display: "flex", alignItems: "center", justifyContent: "center" },
+  sosAddBtn: { marginTop: 4, height: 44, borderRadius: 8, border: `2px dashed ${SOS_RED}`, background: "#FEF2F2", color: SOS_RED, fontWeight: 800, fontSize: 15 },
 
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 8, padding: "12px 16px", border: `1px solid ${LINE}`, boxShadow: CARD_SHADOW },
   brandRow: { display: "flex", alignItems: "center", gap: 12 },
