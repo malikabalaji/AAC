@@ -12,8 +12,6 @@ import http.server
 import socketserver
 import urllib.parse
 import subprocess
-import shutil
-import tempfile
 import os
 import json
 
@@ -31,22 +29,6 @@ VOICE = {
     "en": "Samantha", # English
 }
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Languages with no macOS voice, spoken offline via Piper (natural, neural).
-# Models live in ./piper/ ; synthesis runs in the local ./piper-venv.
-PIPER_PY = os.path.join(BASE_DIR, "piper-venv", "bin", "python")
-PIPER_MODELS = {
-    "ml": os.path.join(BASE_DIR, "piper", "ml_IN-meera-medium.onnx"),  # Malayalam (Meera)
-}
-PIPER_OK = os.path.exists(PIPER_PY)
-
-# eSpeak NG — robotic fallback if a Piper model/venv is missing.
-ESPEAK = {
-    "ml": "ml",       # Malayalam
-}
-ESPEAK_BIN = shutil.which("espeak-ng") or "/opt/homebrew/bin/espeak-ng"
-
 _current = None  # the in-flight speech process, so we can cancel/overlap-stop
 
 
@@ -63,35 +45,6 @@ def _say_mac(voice, text):
     return True
 
 
-def _say_piper(model, text):
-    global _current
-    if not (PIPER_OK and os.path.exists(model)):
-        return False
-    _stop_current()
-    wav = tempfile.mktemp(suffix=".wav")
-    subprocess.run(
-        [PIPER_PY, "-m", "piper", "-m", model, "-f", wav],
-        input=text.encode("utf-8"),
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-    )
-    if os.path.exists(wav) and os.path.getsize(wav) > 0:
-        _current = subprocess.Popen(["afplay", wav])
-        return True
-    return False
-
-
-def _say_espeak(code, text):
-    global _current
-    if not os.path.exists(ESPEAK_BIN):
-        return False
-    _stop_current()
-    wav = tempfile.mktemp(suffix=".wav")
-    # synthesize (fast), then play; -s speed, -p pitch (child-like)
-    subprocess.run([ESPEAK_BIN, "-v", code, "-s", "150", "-p", "70", "-w", wav, text])
-    _current = subprocess.Popen(["afplay", wav])
-    return True
-
-
 class Handler(http.server.SimpleHTTPRequestHandler):
     def _json(self, obj):
         body = json.dumps(obj).encode("utf-8")
@@ -105,13 +58,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
 
-        # Which languages can this machine speak (Mac voices + Piper + eSpeak)?
+        # Which languages can this machine speak via `say`?
         if parsed.path == "/sayvoices":
-            langs = list(VOICE.keys())
-            for l in list(PIPER_MODELS.keys()) + list(ESPEAK.keys()):
-                if l not in langs:
-                    langs.append(l)
-            return self._json({"langs": langs})
+            return self._json({"langs": list(VOICE.keys())})
 
         # Speak some text.
         if parsed.path == "/say":
@@ -119,14 +68,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             text = (q.get("text") or [""])[0]
             lang = (q.get("lang") or ["en"])[0]
             ok = False
-            if text:
+            if text and lang in VOICE:
                 try:
-                    if lang in VOICE:
-                        ok = _say_mac(VOICE[lang], text)
-                    elif lang in PIPER_MODELS and _say_piper(PIPER_MODELS[lang], text):
-                        ok = True
-                    elif lang in ESPEAK:
-                        ok = _say_espeak(ESPEAK[lang], text)
+                    ok = _say_mac(VOICE[lang], text)
                 except Exception:
                     ok = False
             return self._json({"ok": ok})

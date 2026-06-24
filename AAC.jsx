@@ -75,7 +75,6 @@ const LANGUAGES = {
   bn: { label: "Bengali",   native: "বাংলা",    field: "bn", flag: "🇮🇳", voice: ["bn-IN", "bn-BD", "bn"] },
   mr: { label: "Marathi",   native: "मराठी",    field: "mr", flag: "🇮🇳", voice: ["mr-IN", "mr"] },
   kn: { label: "Kannada",   native: "ಕನ್ನಡ",     field: "kn", flag: "🇮🇳", voice: ["kn-IN", "kn"] },
-  ml: { label: "Malayalam", native: "മലയാളം",   field: "ml", flag: "🇮🇳", voice: ["ml-IN", "ml"] },
 };
 
 /* ----------------------------------------------------------------------------
