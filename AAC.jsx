@@ -64,11 +64,11 @@ const SYMBOL_BY_ID = Object.fromEntries(SYMBOLS.map((s) => [s.id, s]));
 const CATEGORIES = {
   people:   { label: "People",       color: "#2563EB" }, // blue
   actions:  { label: "Actions",      color: "#0F766E" }, // teal
-  food:     { label: "Food & Drink", color: "#D97706" }, // amber
-  places:   { label: "Places",       color: "#0EA5E9" }, // sky
+  food:     { label: "Food & Drink", color: "#B45309" }, // amber (AA on white)
+  places:   { label: "Places",       color: "#0369A1" }, // sky   (AA on white)
   things:   { label: "Things",       color: "#7C3AED" }, // purple
   feelings: { label: "Feelings",     color: "#DB2777" }, // pink
-  quick:    { label: "Quick Words",  color: "#16A34A" }, // green
+  quick:    { label: "Quick Words",  color: "#15803D" }, // green (AA on white)
 };
 
 const LANGUAGES = {
@@ -386,17 +386,39 @@ export default function App() {
   const [personalFreq, setPersonalFreq] = usePersistentState("sira.freq", {});      // overall usage
   const [todFreq, setTodFreq] = usePersistentState("sira.todFreq", {});             // usage per time of day
   const [recent, setRecent] = useState([]);
-  const [simHour, setSimHour] = useState(new Date().getHours());
+  const [hour, setHour] = useState(new Date().getHours());
   const [activeCat, setActiveCat] = useState("all");
   const [showPredInfo, setShowPredInfo] = useState(false);
 
+  // keep the time of day current (drives time-aware prediction)
+  useEffect(() => {
+    const id = setInterval(() => setHour(new Date().getHours()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
   // SOS (emergency phrases, set up by a guardian — saved on the device)
   const [sosPhrases, setSosPhrases] = usePersistentState("sira.sos", DEFAULT_SOS);
+  const [sosPin, setSosPin] = usePersistentState("sira.pin", "");  // guardian PIN ("" = not set)
   const [showSOS, setShowSOS] = useState(false);
-  const [sosEdit, setSosEdit] = useState(false);
+  const [sosView, setSosView] = useState("phrases"); // "phrases" | "pin" | "edit"
+  const [pinInput, setPinInput] = useState("");
+  const [pinError, setPinError] = useState("");
+
+  const [clearedSentence, setClearedSentence] = useState(null); // for Undo after Clear
+
+  // Close any open overlay with the Escape key (basic dialog behaviour).
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key !== "Escape") return;
+      if (showSOS) closeSOS();
+      else if (showName) setShowName(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  });
 
   const field = LANGUAGES[lang].field;
-  const tod = timeOfDay(simHour);
+  const tod = timeOfDay(hour);
 
   // Languages the local Mac `say` bridge (serve.py) can speak, if reachable.
   const [serverLangs, setServerLangs] = useState(null);
@@ -422,6 +444,7 @@ export default function App() {
   }, [model, sentence, tod, recent, personalFreq, todFreq]);
 
   const addSymbol = (id) => {
+    setClearedSentence(null); // a new tap supersedes any undo
     setSentence((s) => [...s, id]);
     setRecent((r) => [...r, id].slice(-12));
     setPersonalFreq((f) => ({ ...f, [id]: (f[id] || 0) + 1 }));
@@ -444,8 +467,29 @@ export default function App() {
     speak(text, lang, voices);
   };
 
-  const backspace = () => setSentence((s) => s.slice(0, -1));
-  const clearAll = () => setSentence([]);
+  const backspace = () => { setClearedSentence(null); setSentence((s) => s.slice(0, -1)); };
+  const clearAll = () => {
+    if (sentence.length) setClearedSentence(sentence); // keep a copy so Clear is undoable
+    setSentence([]);
+  };
+  const undoClear = () => {
+    if (clearedSentence) { setSentence(clearedSentence); setClearedSentence(null); }
+  };
+
+  // SOS open/close + guardian PIN gate
+  const openSOS = () => { setShowSOS(true); setSosView("phrases"); };
+  const closeSOS = () => { setShowSOS(false); setSosView("phrases"); setPinInput(""); setPinError(""); };
+  const openGuardian = () => { setPinInput(""); setPinError(""); setSosView("pin"); };
+  const submitPin = () => {
+    if (!sosPin) {                                   // first time — create a PIN
+      if (pinInput.length >= 4) { setSosPin(pinInput); setSosView("edit"); }
+      else setPinError("Choose a PIN of at least 4 digits.");
+    } else if (pinInput === sosPin) {                // unlock
+      setSosView("edit");
+    } else {
+      setPinError("Incorrect PIN.");
+    }
+  };
 
   const chooseLang = (k) => {
     setLang(k);
@@ -508,7 +552,8 @@ export default function App() {
           <button
             style={st.sosBtn}
             className="sos-btn"
-            onClick={() => { setShowSOS(true); setSosEdit(false); }}
+            onClick={openSOS}
+            aria-label="Emergency phrases"
             title="Emergency"
           >
             <Om ch="🆘" size={20} style={{ marginRight: 6 }} />
@@ -543,21 +588,33 @@ export default function App() {
         </div>
       </header>
 
-      {/* SOS overlay — large emergency phrases; guardian can set them up */}
+      {/* SOS overlay — large emergency phrases; guardian (PIN) can set them up */}
       {showSOS && (
-        <div style={st.sosOverlay} onClick={() => setShowSOS(false)}>
-          <div style={st.sosCard} onClick={(e) => e.stopPropagation()}>
+        <div style={st.sosOverlay} onClick={closeSOS}>
+          <div
+            style={st.sosCard}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Emergency phrases"
+          >
             <div style={st.sosHead}>
               <span style={st.sosTitle}><Om ch="🆘" size={26} style={{ marginRight: 8 }} /> Emergency</span>
               <div style={{ display: "flex", gap: 8 }}>
-                <button style={st.sosSetupBtn} onClick={() => setSosEdit((v) => !v)}>
-                  {sosEdit ? "Done" : "⚙ Guardian setup"}
-                </button>
-                <button style={st.sosCloseBtn} onClick={() => setShowSOS(false)}>✕</button>
+                {sosView === "phrases" && (
+                  <button style={st.sosSetupBtn} onClick={openGuardian}>⚙ Guardian setup</button>
+                )}
+                {sosView === "edit" && (
+                  <button style={st.sosSetupBtn} onClick={() => setSosView("phrases")}>Done</button>
+                )}
+                {sosView === "pin" && (
+                  <button style={st.sosSetupBtn} onClick={() => setSosView("phrases")}>Cancel</button>
+                )}
+                <button style={st.sosCloseBtn} onClick={closeSOS} aria-label="Close">✕</button>
               </div>
             </div>
 
-            {!sosEdit ? (
+            {sosView === "phrases" && (
               /* EMERGENCY MODE — tap a phrase to say it loudly */
               <div style={st.sosGrid}>
                 {sosPhrases.length === 0 && (
@@ -570,7 +627,34 @@ export default function App() {
                   </button>
                 ))}
               </div>
-            ) : (
+            )}
+
+            {sosView === "pin" && (
+              /* GUARDIAN GATE — enter (or first-time create) a PIN */
+              <div style={st.pinWrap}>
+                <p style={st.sosEditHint}>
+                  {sosPin
+                    ? "Enter the guardian PIN to edit emergency phrases."
+                    : "Set a guardian PIN (4+ digits) to protect the emergency phrases."}
+                </p>
+                <input
+                  style={st.pinInput}
+                  type="password"
+                  inputMode="numeric"
+                  autoFocus
+                  value={pinInput}
+                  placeholder="••••"
+                  onChange={(e) => { setPinInput(e.target.value); setPinError(""); }}
+                  onKeyDown={(e) => { if (e.key === "Enter") submitPin(); }}
+                />
+                {pinError && <p style={st.pinError}>{pinError}</p>}
+                <button style={st.pinSubmit} onClick={submitPin}>
+                  {sosPin ? "Unlock" : "Set PIN & continue"}
+                </button>
+              </div>
+            )}
+
+            {sosView === "edit" && (
               /* GUARDIAN SETUP — add / edit / remove phrases */
               <div style={st.sosEditWrap}>
                 <p style={st.sosEditHint}>
@@ -582,6 +666,7 @@ export default function App() {
                       style={st.sosEditInput}
                       value={p.text}
                       placeholder="Emergency sentence"
+                      aria-label={"Emergency phrase " + (i + 1)}
                       onChange={(e) =>
                         setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))
                       }
@@ -589,6 +674,7 @@ export default function App() {
                     <select
                       style={st.sosEditSelect}
                       value={p.lang || lang}
+                      aria-label="Phrase language"
                       onChange={(e) =>
                         setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, lang: e.target.value } : x)))
                       }
@@ -597,12 +683,13 @@ export default function App() {
                         <option key={k} value={k}>{v.label}</option>
                       ))}
                     </select>
-                    <button style={st.sosTestBtn} title="Test" onClick={() => speakSos(p)}>
+                    <button style={st.sosTestBtn} title="Test" aria-label="Test phrase" onClick={() => speakSos(p)}>
                       <Om ch="🔊" size={18} />
                     </button>
                     <button
                       style={st.sosDelBtn}
                       title="Remove"
+                      aria-label="Remove phrase"
                       onClick={() => setSosPhrases((arr) => arr.filter((_, j) => j !== i))}
                     >
                       <Om ch="🗑️" size={18} />
@@ -636,7 +723,13 @@ export default function App() {
       {/* "My name" overlay — for when someone asks the child their name */}
       {showName && (
         <div style={st.nameOverlay} onClick={() => setShowName(false)}>
-          <div style={st.nameOverlayCard} onClick={(e) => e.stopPropagation()}>
+          <div
+            style={st.nameOverlayCard}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="My name"
+          >
             <span style={st.nameOverlayLabel}>My name is</span>
             <span style={st.nameOverlayName}>{childName.trim()}</span>
             <div style={st.nameOverlayActions}>
@@ -656,7 +749,7 @@ export default function App() {
 
       {/* Sentence strip */}
       <section style={st.sentenceBar}>
-        <div style={st.sentenceScroll}>
+        <div style={st.sentenceScroll} lang={field}>
           {sentence.length === 0 ? (
             <span style={st.placeholder}>Tap symbols to build a sentence</span>
           ) : (
@@ -672,9 +765,12 @@ export default function App() {
           )}
         </div>
         <div style={st.sentActions}>
-          <button onClick={backspace} style={st.iconBtn} title="Delete last" disabled={!sentence.length}><Om ch="⬅️" size={22} /></button>
-          <button onClick={clearAll} style={st.iconBtn} title="Clear" disabled={!sentence.length}><Om ch="🗑️" size={22} /></button>
-          <button onClick={speakSentence} style={st.speakBtn} disabled={!sentence.length}>
+          {clearedSentence && !sentence.length && (
+            <button onClick={undoClear} style={st.undoBtn} title="Undo clear" aria-label="Undo clear">↩ Undo</button>
+          )}
+          <button onClick={backspace} style={st.iconBtn} title="Delete last" aria-label="Delete last word" disabled={!sentence.length}><Om ch="⬅️" size={22} /></button>
+          <button onClick={clearAll} style={st.iconBtn} title="Clear" aria-label="Clear sentence" disabled={!sentence.length}><Om ch="🗑️" size={22} /></button>
+          <button onClick={speakSentence} style={st.speakBtn} aria-label="Speak sentence" disabled={!sentence.length}>
             <Om ch="🔊" size={20} style={{ marginRight: 8 }} /> Speak
           </button>
         </div>
@@ -696,7 +792,7 @@ export default function App() {
             and the order adapts to the child.
           </div>
         )}
-        <div style={st.predRow}>
+        <div style={st.predRow} lang={field}>
           {predictions.map((id) => {
             const s = SYMBOL_BY_ID[id];
             return (
@@ -732,7 +828,7 @@ export default function App() {
       </div>
 
       {/* Main board */}
-      <section style={st.board}>
+      <section style={st.board} lang={field}>
         {visibleSymbols.map((s) => (
           <button
             key={s.id}
@@ -750,13 +846,8 @@ export default function App() {
       {/* Time simulator + personalization peek */}
       <footer style={st.footer}>
         <div style={st.footBlock}>
-          <label style={st.footLabel}>Simulate time of day (demo)</label>
-          <input
-            type="range" min="0" max="23" value={simHour}
-            onChange={(e) => setSimHour(Number(e.target.value))}
-            style={st.slider}
-          />
-          <span style={st.footValue}>{String(simHour).padStart(2, "0")}:00 · {tod}</span>
+          <label style={st.footLabel}>Time of day (adapts predictions)</label>
+          <span style={st.footValue}>{String(hour).padStart(2, "0")}:00 · {tod}</span>
         </div>
         <div style={st.footBlock}>
           <label style={st.footLabel}>Child's top used symbols (learned live)</label>
@@ -874,6 +965,12 @@ const st = {
   sosTestBtn: { width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: `1.5px solid ${LINE}`, background: "#fff", display: "flex", alignItems: "center", justifyContent: "center" },
   sosDelBtn: { width: 40, height: 40, flexShrink: 0, borderRadius: 8, border: "1.5px solid #FECACA", background: "#FEF2F2", display: "flex", alignItems: "center", justifyContent: "center" },
   sosAddBtn: { marginTop: 4, height: 44, borderRadius: 8, border: `2px dashed ${SOS_RED}`, background: "#FEF2F2", color: SOS_RED, fontWeight: 800, fontSize: 15 },
+  pinWrap: { display: "flex", flexDirection: "column", gap: 12, alignItems: "stretch", maxWidth: 320, margin: "0 auto", padding: "12px 0" },
+  pinInput: { height: 52, textAlign: "center", letterSpacing: "8px", fontSize: 24, fontWeight: 800, fontFamily: "inherit", color: INK, border: `1.5px solid ${LINE}`, borderRadius: 10, outline: "none" },
+  pinError: { margin: 0, color: SOS_RED, fontWeight: 700, fontSize: 14, textAlign: "center" },
+  pinSubmit: { height: 48, borderRadius: 8, border: "none", background: ACCENT, color: "#fff", fontWeight: 800, fontSize: 16 },
+
+  undoBtn: { height: 44, padding: "0 16px", borderRadius: 8, border: `1.5px solid ${ACCENT}`, background: "#EFF6FF", color: ACCENT, fontWeight: 800, fontSize: 15 },
 
   header: { display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12, marginBottom: 14, background: "#fff", borderRadius: 8, padding: "12px 16px", border: `1px solid ${LINE}`, boxShadow: CARD_SHADOW },
   brandRow: { display: "flex", alignItems: "center", gap: 12 },
@@ -887,7 +984,7 @@ const st = {
 
   sentenceBar: { display: "flex", alignItems: "center", gap: 10, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 12, marginBottom: 14, boxShadow: CARD_SHADOW },
   sentenceScroll: { flex: 1, display: "flex", gap: 8, overflowX: "auto", minHeight: 64, alignItems: "center" },
-  placeholder: { color: "#9CA3AF", fontWeight: 600, fontSize: 15, paddingLeft: 6 },
+  placeholder: { color: "#6B7280", fontWeight: 600, fontSize: 15, paddingLeft: 6 },
   sentChip: { display: "flex", flexDirection: "column", alignItems: "center", background: PAPER, borderRadius: 8, padding: "6px 12px", minWidth: 62 },
   sentWord: { fontSize: 13, fontWeight: 800, marginTop: 2, whiteSpace: "nowrap" },
   sentActions: { display: "flex", gap: 6, alignItems: "center" },
@@ -897,7 +994,7 @@ const st = {
   predSection: { marginBottom: 16 },
   predHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 },
   predLabel: { fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED, display: "flex", alignItems: "center", gap: 6 },
-  infoBtn: { width: 20, height: 20, borderRadius: 6, border: "none", background: "#DBEAFE", color: ACCENT, fontSize: 12, fontWeight: 900, lineHeight: 1 },
+  infoBtn: { width: 28, height: 28, borderRadius: 999, border: "none", background: "#DBEAFE", color: ACCENT, fontSize: 14, fontWeight: 900, lineHeight: 1 },
   infoBox: { background: "#EFF6FF", border: "1px solid #BFDBFE", borderRadius: 8, padding: "10px 14px", fontSize: 13, color: "#1E3A8A", marginBottom: 10, lineHeight: 1.5 },
   todTag: { display: "flex", alignItems: "center", fontSize: 13, fontWeight: 700, color: TEAL, background: "#CCFBF1", padding: "4px 10px", borderRadius: 6 },
   predRow: { display: "grid", gridTemplateColumns: "repeat(6, 1fr)", gap: 8 },
@@ -905,7 +1002,7 @@ const st = {
   predWord: { fontSize: 14, fontWeight: 800, textAlign: "center", color: INK },
 
   catRow: { display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 14 },
-  catChip: { padding: "7px 14px", borderRadius: 6, border: `1px solid ${LINE}`, background: "#fff", fontWeight: 700, fontSize: 14, color: INK },
+  catChip: { display: "inline-flex", alignItems: "center", height: 44, padding: "0 16px", borderRadius: 6, border: `1px solid ${LINE}`, background: "#fff", fontWeight: 700, fontSize: 15, color: INK },
   catChipActive: { background: ACCENT, color: "#fff", borderColor: ACCENT },
 
   board: { display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(108px, 1fr))", gap: 10, marginBottom: 22 },
@@ -913,7 +1010,7 @@ const st = {
   tileBar: { position: "absolute", top: 0, left: 0, right: 0, height: 5 },
   tileGlyph: { marginTop: 2 },
   tileWord: { fontSize: 18, fontWeight: 700, textAlign: "center", marginTop: 6, color: INK },
-  tileEn: { fontSize: 11, color: "#9CA3AF", fontWeight: 600 },
+  tileEn: { fontSize: 11, color: "#6B7280", fontWeight: 600 },
 
   footer: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 16, boxShadow: CARD_SHADOW },
   footBlock: { display: "flex", flexDirection: "column", gap: 8 },
