@@ -360,70 +360,55 @@ function usePersistentState(key, initial) {
   return [value, setValue];
 }
 
-/* Switch scanning (single-switch row/column access).
-   A highlight auto-steps through the visual rows of buttons; pressing the
-   switch (Space or Enter) selects a row, then steps through its items, and the
-   next press activates the highlighted item. Works on whatever is on screen
-   (the board, or an open dialog), re-measuring each step so it adapts. */
+/* Switch scanning (single-switch linear access).
+   A highlight auto-steps through one button at a time (left-to-right,
+   top-to-bottom). Pressing the switch (Space or Enter) activates the currently
+   highlighted button. Works on whatever is on screen (the board, or an open
+   dialog), re-measuring each step so it adapts. */
 function useSwitchScanning(enabled, dwellMs) {
   useEffect(() => {
     if (!enabled) return;
-    let phase = "row", rowIdx = 0, itemIdx = 0, cycles = 0, rows = [];
+    let idx = 0, items = [];
 
     const clearHL = () =>
-      document.querySelectorAll(".scan-row,.scan-item").forEach((el) =>
-        el.classList.remove("scan-row", "scan-item"));
+      document.querySelectorAll(".scan-item").forEach((el) => el.classList.remove("scan-item"));
 
     const collect = () => {
       const root = document.querySelector('[role="dialog"]') || document.getElementById("scan-root");
       if (!root) return [];
-      const btns = [...root.querySelectorAll("button")].filter((b) => !b.disabled && b.offsetParent !== null);
-      const map = new Map(); // group buttons into visual rows by their top edge
-      btns.forEach((b) => {
-        const top = Math.round(b.getBoundingClientRect().top / 8) * 8;
-        if (!map.has(top)) map.set(top, []);
-        map.get(top).push(b);
-      });
-      return [...map.entries()].sort((a, b) => a[0] - b[0])
-        .map(([, arr]) => arr.sort((x, y) => x.getBoundingClientRect().left - y.getBoundingClientRect().left));
+      // every visible, enabled button, ordered top-to-bottom then left-to-right
+      return [...root.querySelectorAll("button")]
+        .filter((b) => !b.disabled && b.offsetParent !== null)
+        .sort((a, b) => {
+          const ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+          const dy = Math.round(ra.top / 8) - Math.round(rb.top / 8);
+          return dy !== 0 ? dy : ra.left - rb.left;
+        });
     };
 
     const paint = () => {
       clearHL();
-      rows = collect();
-      if (!rows.length) return;
-      rowIdx = rowIdx % rows.length;
-      const row = rows[rowIdx] || [];
-      row.forEach((el) => el.classList.add("scan-row"));
-      if (phase === "item" && row.length) {
-        itemIdx = itemIdx % row.length;
-        row[itemIdx].classList.add("scan-item");
-      }
+      items = collect();
+      if (!items.length) return;
+      idx = idx % items.length;
+      items[idx].classList.add("scan-item");
     };
 
     const tick = () => {
-      rows = collect();
-      if (!rows.length) { paint(); return; }
-      if (phase === "row") {
-        rowIdx = (rowIdx + 1) % rows.length;
-      } else {
-        const row = rows[rowIdx] || [];
-        if (itemIdx + 1 >= row.length) { itemIdx = 0; if (++cycles >= 2) { phase = "row"; cycles = 0; } }
-        else itemIdx++;
-      }
+      items = collect();
+      if (!items.length) { paint(); return; }
+      idx = (idx + 1) % items.length;
       paint();
     };
 
     const select = () => {
-      rows = collect();
-      if (!rows.length) return;
-      if (phase === "row") { phase = "item"; itemIdx = 0; cycles = 0; paint(); }
-      else {
-        const el = rows[rowIdx] && rows[rowIdx][itemIdx];
-        phase = "row"; cycles = 0; clearHL();
-        if (el) el.click();
-        paint();
-      }
+      items = collect();
+      if (!items.length) return;
+      const el = items[idx % items.length];
+      clearHL();
+      if (el) el.click();
+      idx = 0; // restart from the top after a choice
+      paint();
     };
 
     const onKey = (e) => {
@@ -500,6 +485,7 @@ export default function App() {
   const [langChosen, setLangChosen] = useState(false); // show picker until a language is chosen
   const [childName, setChildName] = usePersistentState("sira.name", ""); // saved across visits
   const [showName, setShowName] = useState(false);     // big "my name" overlay
+  const [showLang, setShowLang] = useState(false);     // language chooser overlay
   const [sentence, setSentence] = useState([]);      // array of symbol ids
   const [personalFreq, setPersonalFreq] = usePersistentState("sira.freq", {});      // overall usage
   const [todFreq, setTodFreq] = usePersistentState("sira.todFreq", {});             // usage per time of day
@@ -535,6 +521,7 @@ export default function App() {
       if (e.key !== "Escape") return;
       if (showSOS) closeSOS();
       else if (showName) setShowName(false);
+      else if (showLang) setShowLang(false);
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -695,24 +682,49 @@ export default function App() {
               <span style={st.nameChipText}>{childName.trim()}</span>
             </button>
           )}
-          <div style={st.langSelectWrap}>
-            <Om ch="🌐" size={16} style={st.langGlobe} />
-            <select
-              value={lang}
-              onChange={(e) => setLang(e.target.value)}
-              style={st.langSelect}
-              aria-label="Language"
-            >
-              {Object.entries(LANGUAGES).map(([k, v]) => (
-                <option key={k} value={k}>
-                  {v.native} · {v.label}
-                </option>
-              ))}
-            </select>
-            <span style={st.langCaret}>▾</span>
-          </div>
+          <button
+            style={st.langBtn}
+            onClick={() => setShowLang(true)}
+            aria-label="Change language"
+            title="Change language"
+          >
+            <Om ch="🌐" size={16} style={{ marginRight: 6 }} />
+            {LANGUAGES[lang].native}
+            <span style={st.langBtnCaret}>▾</span>
+          </button>
         </div>
       </header>
+
+      {/* Language chooser — buttons so it works with switch scanning too */}
+      {showLang && (
+        <div style={st.langOverlay} onClick={() => setShowLang(false)}>
+          <div
+            style={st.langCard}
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Choose a language"
+          >
+            <div style={st.langCardHead}>
+              <span style={st.langCardTitle}>Choose a language</span>
+              <button style={st.sosCloseBtn} onClick={() => setShowLang(false)} aria-label="Close">✕</button>
+            </div>
+            <div style={st.langCardGrid}>
+              {Object.entries(LANGUAGES).map(([k, v]) => (
+                <button
+                  key={k}
+                  className="tile-press lang-tile"
+                  style={{ ...st.pickerTile, ...(k === lang ? { borderColor: ACCENT, borderWidth: 2 } : {}) }}
+                  onClick={() => { setLang(k); setShowLang(false); }}
+                >
+                  <span style={st.pickerNative}>{v.native}</span>
+                  <span style={st.pickerLabel}>{v.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* SOS overlay — large emergency phrases; guardian (PIN) can set them up */}
       {showSOS && (
@@ -1033,8 +1045,7 @@ const globalCss = `
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
   .tile-press:active { transform: scale(0.96); }
   .sos-btn:hover { filter: brightness(1.06); }
-  /* switch-scanning highlights */
-  .scan-row { outline: 3px solid #F59E0B !important; outline-offset: 1px; border-radius: 8px; }
+  /* switch-scanning highlight (one box at a time) */
   .scan-item { outline: 5px solid #2563EB !important; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(37,99,235,0.25) !important; }
   .lang-tile { transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
   .lang-tile:hover {
@@ -1128,10 +1139,13 @@ const st = {
   title: { margin: 0, fontSize: 32, fontWeight: 700, letterSpacing: "-1.5px", color: ACCENT },
   subtitle: { margin: 0, fontSize: 13, color: MUTED, fontWeight: 500, letterSpacing: "0.4px" },
 
-  langSelectWrap: { position: "relative", display: "flex", alignItems: "center", background: "#fff", border: `1px solid ${LINE}`, borderRadius: 6, padding: "0 34px 0 12px" },
-  langGlobe: { marginRight: 6 },
-  langSelect: { appearance: "none", WebkitAppearance: "none", MozAppearance: "none", border: "none", background: "transparent", color: INK, fontFamily: "inherit", fontWeight: 800, fontSize: 15, padding: "10px 4px", cursor: "pointer", outline: "none" },
-  langCaret: { position: "absolute", right: 14, color: ACCENT, fontSize: 12, fontWeight: 900, pointerEvents: "none" },
+  langBtn: { display: "inline-flex", alignItems: "center", height: 44, padding: "0 14px", borderRadius: 6, border: `1px solid ${LINE}`, background: "#fff", color: INK, fontFamily: "inherit", fontWeight: 800, fontSize: 15 },
+  langBtnCaret: { marginLeft: 8, color: ACCENT, fontSize: 12, fontWeight: 900 },
+  langOverlay: { position: "fixed", inset: 0, background: "rgba(17,24,39,0.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20, zIndex: 55 },
+  langCard: { background: "#fff", borderRadius: 12, padding: 20, width: "100%", maxWidth: 680, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 60px rgba(0,0,0,0.30)" },
+  langCardHead: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 },
+  langCardTitle: { fontSize: 22, fontWeight: 900, color: INK, letterSpacing: "-0.5px" },
+  langCardGrid: { display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 12 },
 
   sentenceBar: { display: "flex", alignItems: "center", gap: 10, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 12, marginBottom: 14, boxShadow: CARD_SHADOW },
   sentenceScroll: { flex: 1, display: "flex", gap: 8, overflowX: "auto", minHeight: 64, alignItems: "center" },
