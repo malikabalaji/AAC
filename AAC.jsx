@@ -360,16 +360,134 @@ function usePersistentState(key, initial) {
   return [value, setValue];
 }
 
-// Default emergency phrases. A guardian can edit, translate, add, or remove
-// these in the SOS setup. Each carries the language it should be spoken in.
-const DEFAULT_SOS = [
-  { text: "I need help!",              lang: "en" },
-  { text: "Please call my mother.",    lang: "en" },
-  { text: "I am in pain.",             lang: "en" },
-  { text: "I need the toilet.",        lang: "en" },
-  { text: "Please take me home.",      lang: "en" },
-  { text: "Call a doctor.",            lang: "en" },
-];
+/* Switch scanning (single-switch row/column access).
+   A highlight auto-steps through the visual rows of buttons; pressing the
+   switch (Space or Enter) selects a row, then steps through its items, and the
+   next press activates the highlighted item. Works on whatever is on screen
+   (the board, or an open dialog), re-measuring each step so it adapts. */
+function useSwitchScanning(enabled, dwellMs) {
+  useEffect(() => {
+    if (!enabled) return;
+    let phase = "row", rowIdx = 0, itemIdx = 0, cycles = 0, rows = [];
+
+    const clearHL = () =>
+      document.querySelectorAll(".scan-row,.scan-item").forEach((el) =>
+        el.classList.remove("scan-row", "scan-item"));
+
+    const collect = () => {
+      const root = document.querySelector('[role="dialog"]') || document.getElementById("scan-root");
+      if (!root) return [];
+      const btns = [...root.querySelectorAll("button")].filter((b) => !b.disabled && b.offsetParent !== null);
+      const map = new Map(); // group buttons into visual rows by their top edge
+      btns.forEach((b) => {
+        const top = Math.round(b.getBoundingClientRect().top / 8) * 8;
+        if (!map.has(top)) map.set(top, []);
+        map.get(top).push(b);
+      });
+      return [...map.entries()].sort((a, b) => a[0] - b[0])
+        .map(([, arr]) => arr.sort((x, y) => x.getBoundingClientRect().left - y.getBoundingClientRect().left));
+    };
+
+    const paint = () => {
+      clearHL();
+      rows = collect();
+      if (!rows.length) return;
+      rowIdx = rowIdx % rows.length;
+      const row = rows[rowIdx] || [];
+      row.forEach((el) => el.classList.add("scan-row"));
+      if (phase === "item" && row.length) {
+        itemIdx = itemIdx % row.length;
+        row[itemIdx].classList.add("scan-item");
+      }
+    };
+
+    const tick = () => {
+      rows = collect();
+      if (!rows.length) { paint(); return; }
+      if (phase === "row") {
+        rowIdx = (rowIdx + 1) % rows.length;
+      } else {
+        const row = rows[rowIdx] || [];
+        if (itemIdx + 1 >= row.length) { itemIdx = 0; if (++cycles >= 2) { phase = "row"; cycles = 0; } }
+        else itemIdx++;
+      }
+      paint();
+    };
+
+    const select = () => {
+      rows = collect();
+      if (!rows.length) return;
+      if (phase === "row") { phase = "item"; itemIdx = 0; cycles = 0; paint(); }
+      else {
+        const el = rows[rowIdx] && rows[rowIdx][itemIdx];
+        phase = "row"; cycles = 0; clearHL();
+        if (el) el.click();
+        paint();
+      }
+    };
+
+    const onKey = (e) => {
+      const t = document.activeElement;
+      if (t && /^(INPUT|SELECT|TEXTAREA)$/.test(t.tagName)) return; // let the guardian type
+      if (e.code === "Space" || e.key === "Enter") { e.preventDefault(); select(); }
+    };
+
+    paint();
+    const id = setInterval(tick, dwellMs);
+    window.addEventListener("keydown", onKey, true);
+    return () => { clearInterval(id); window.removeEventListener("keydown", onKey, true); clearHL(); };
+  }, [enabled, dwellMs]);
+}
+
+// Default emergency phrases, pre-translated so changing a phrase's language
+// actually speaks it in that language (not English with another accent).
+const SOS_PHRASES = {
+  help: {
+    en: "I need help!", ta: "எனக்கு உதவி வேண்டும்!", hi: "मुझे मदद चाहिए!",
+    te: "నాకు సహాయం కావాలి!", bn: "আমার সাহায্য দরকার!", mr: "मला मदत हवी आहे!", kn: "ನನಗೆ ಸಹಾಯ ಬೇಕು!",
+  },
+  mother: {
+    en: "Please call my mother.", ta: "தயவுசெய்து என் அம்மாவை அழைக்கவும்.", hi: "कृपया मेरी माँ को बुलाओ।",
+    te: "దయచేసి మా అమ్మను పిలవండి.", bn: "দয়া করে আমার মাকে ডাকুন।", mr: "कृपया माझ्या आईला बोलवा.", kn: "ದಯವಿಟ್ಟು ನನ್ನ ಅಮ್ಮನನ್ನು ಕರೆಯಿರಿ.",
+  },
+  pain: {
+    en: "I am in pain.", ta: "எனக்கு வலிக்கிறது.", hi: "मुझे दर्द हो रहा है।",
+    te: "నాకు నొప్పిగా ఉంది.", bn: "আমার ব্যথা হচ্ছে।", mr: "मला वेदना होत आहेत.", kn: "ನನಗೆ ನೋವಾಗುತ್ತಿದೆ.",
+  },
+  toilet: {
+    en: "I need the toilet.", ta: "எனக்கு கழிப்பறை வேண்டும்.", hi: "मुझे टॉयलेट जाना है।",
+    te: "నాకు టాయిలెట్ కావాలి.", bn: "আমার টয়লেট দরকার।", mr: "मला टॉयलेटला जायचे आहे.", kn: "ನನಗೆ ಟಾಯ್ಲೆಟ್ ಬೇಕು.",
+  },
+  home: {
+    en: "Please take me home.", ta: "தயவுசெய்து என்னை வீட்டிற்கு அழைத்துச் செல்லுங்கள்.", hi: "कृपया मुझे घर ले चलो।",
+    te: "దయచేసి నన్ను ఇంటికి తీసుకెళ్లండి.", bn: "দয়া করে আমাকে বাড়ি নিয়ে চলুন।", mr: "कृपया मला घरी घेऊन चला.", kn: "ದಯವಿಟ್ಟು ನನ್ನನ್ನು ಮನೆಗೆ ಕರೆದೊಯ್ಯಿರಿ.",
+  },
+  doctor: {
+    en: "Call a doctor.", ta: "ஒரு மருத்துவரை அழைக்கவும்.", hi: "डॉक्टर को बुलाओ।",
+    te: "డాక్టర్‌ను పిలవండి.", bn: "একজন ডাক্তার ডাকুন।", mr: "डॉक्टरला बोलवा.", kn: "ವೈದ್ಯರನ್ನು ಕರೆಯಿರಿ.",
+  },
+};
+
+// A phrase is either a built-in (has an id → translated) or custom (has text).
+const DEFAULT_SOS = Object.keys(SOS_PHRASES).map((id) => ({ id, lang: "en" }));
+
+// The text to show/speak for a phrase in its chosen language.
+function sosText(p) {
+  if (p.id && SOS_PHRASES[p.id]) return SOS_PHRASES[p.id][p.lang] || SOS_PHRASES[p.id].en;
+  return p.text || "";
+}
+
+// Upgrade old saved phrases (plain English text, no id) so they translate.
+function withSosIds(arr) {
+  return arr.map((p) => {
+    if (p.id) return p;
+    const t = (p.text || "").trim();
+    for (const id in SOS_PHRASES) {
+      if (Object.values(SOS_PHRASES[id]).some((v) => v === t)) return { id, lang: p.lang || "en" };
+    }
+    return p; // genuinely custom
+  });
+}
 
 /* ----------------------------------------------------------------------------
    7. APP
@@ -405,6 +523,11 @@ export default function App() {
   const [pinError, setPinError] = useState("");
 
   const [clearedSentence, setClearedSentence] = useState(null); // for Undo after Clear
+
+  // Switch-scanning accessibility (single-switch row/column access)
+  const [scanOn, setScanOn] = usePersistentState("sira.scan", false);
+  const [dwellMs, setDwellMs] = usePersistentState("sira.dwell", 1500);
+  useSwitchScanning(langChosen && scanOn, dwellMs);
 
   // Close any open overlay with the Escape key (basic dialog behaviour).
   useEffect(() => {
@@ -458,8 +581,11 @@ export default function App() {
     if (sym) speak(sym[field], lang, voices); // speak each tapped word
   };
 
-  // Speak an emergency phrase (and keep the SOS panel open).
-  const speakSos = (phrase) => speak(phrase.text, phrase.lang || lang, voices);
+  // Speak an emergency phrase in its chosen language (translated text + voice).
+  const speakSos = (phrase) => speak(sosText(phrase), phrase.lang || lang, voices);
+
+  // One-time upgrade of any previously-saved phrases so they translate.
+  useEffect(() => { setSosPhrases((arr) => withSosIds(arr)); }, []);
 
   const speakSentence = () => {
     if (!sentence.length) return;
@@ -536,7 +662,7 @@ export default function App() {
   }
 
   return (
-    <div style={st.page}>
+    <div style={st.page} id="scan-root">
       <style>{globalCss}</style>
 
       {/* Header */}
@@ -621,9 +747,9 @@ export default function App() {
                   <p style={st.sosEmpty}>No phrases yet. Tap “Guardian setup” to add some.</p>
                 )}
                 {sosPhrases.map((p, i) => (
-                  <button key={i} style={st.sosPhrase} className="tile-press" onClick={() => speakSos(p)}>
+                  <button key={i} style={st.sosPhrase} className="tile-press" lang={p.lang || lang} onClick={() => speakSos(p)}>
                     <Om ch="🔊" size={22} style={{ marginRight: 10, flexShrink: 0 }} />
-                    <span>{p.text}</span>
+                    <span>{sosText(p)}</span>
                   </button>
                 ))}
               </div>
@@ -664,11 +790,13 @@ export default function App() {
                   <div key={i} style={st.sosEditRow}>
                     <input
                       style={st.sosEditInput}
-                      value={p.text}
+                      value={sosText(p)}
                       placeholder="Emergency sentence"
+                      lang={p.lang || lang}
                       aria-label={"Emergency phrase " + (i + 1)}
                       onChange={(e) =>
-                        setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, text: e.target.value } : x)))
+                        // editing the text makes it a custom phrase (drops the built-in translation)
+                        setSosPhrases((arr) => arr.map((x, j) => (j === i ? { text: e.target.value, lang: x.lang || lang } : x)))
                       }
                     />
                     <select
@@ -676,6 +804,7 @@ export default function App() {
                       value={p.lang || lang}
                       aria-label="Phrase language"
                       onChange={(e) =>
+                        // for built-ins this re-translates; for custom it changes only the voice
                         setSosPhrases((arr) => arr.map((x, j) => (j === i ? { ...x, lang: e.target.value } : x)))
                       }
                     >
@@ -850,6 +979,25 @@ export default function App() {
           <span style={st.footValue}>{String(hour).padStart(2, "0")}:00 · {tod}</span>
         </div>
         <div style={st.footBlock}>
+          <label style={st.footLabel}>Switch scanning (accessibility)</label>
+          <label style={st.scanToggle}>
+            <input type="checkbox" checked={scanOn} onChange={(e) => setScanOn(e.target.checked)} />
+            Enable single-switch scanning
+          </label>
+          {scanOn && (
+            <>
+              <input
+                type="range" min="600" max="4000" step="100" value={dwellMs}
+                onChange={(e) => setDwellMs(Number(e.target.value))}
+                style={st.slider} aria-label="Scan speed"
+              />
+              <span style={st.footValue}>
+                {(dwellMs / 1000).toFixed(1)}s per step · press <b>Space</b> or <b>Enter</b> to select
+              </span>
+            </>
+          )}
+        </div>
+        <div style={st.footBlock}>
           <label style={st.footLabel}>Child's top used symbols (learned live)</label>
           <div style={st.freqRow}>
             {Object.entries(personalFreq).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([id, c]) => (
@@ -885,6 +1033,9 @@ const globalCss = `
   button:focus-visible { outline: 3px solid ${ACCENT}; outline-offset: 2px; }
   .tile-press:active { transform: scale(0.96); }
   .sos-btn:hover { filter: brightness(1.06); }
+  /* switch-scanning highlights */
+  .scan-row { outline: 3px solid #F59E0B !important; outline-offset: 1px; border-radius: 8px; }
+  .scan-item { outline: 5px solid #2563EB !important; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(37,99,235,0.25) !important; }
   .lang-tile { transition: border-color 0.15s, box-shadow 0.15s, transform 0.12s; }
   .lang-tile:hover {
     border-color: ${ACCENT};
@@ -1012,7 +1163,8 @@ const st = {
   tileWord: { fontSize: 18, fontWeight: 700, textAlign: "center", marginTop: 6, color: INK },
   tileEn: { fontSize: 11, color: "#6B7280", fontWeight: 600 },
 
-  footer: { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 16, boxShadow: CARD_SHADOW },
+  footer: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 16, background: "#fff", border: `1px solid ${LINE}`, borderRadius: 8, padding: 16, boxShadow: CARD_SHADOW },
+  scanToggle: { display: "flex", alignItems: "center", gap: 8, fontSize: 14, fontWeight: 700, color: INK },
   footBlock: { display: "flex", flexDirection: "column", gap: 8 },
   footLabel: { fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.5px", color: MUTED },
   slider: { width: "100%", accentColor: ACCENT },
