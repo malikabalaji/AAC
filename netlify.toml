@@ -1,0 +1,38 @@
+# AACASH — Netlify deploy config
+# Netlify over Vercel: this is a fully static PWA (no server code), and
+# Netlify covers SPA redirects, headers, and immutable asset caching in this
+# one file on the free tier.
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+
+# SPA fallback — the app handles its own views
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Hashed build assets never change — cache forever
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# The service worker itself must always revalidate
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "no-cache"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    Referrer-Policy = "no-referrer"

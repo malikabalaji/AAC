@@ -1,0 +1,166 @@
+/* ============================================================================
+   AACASH DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   AACASH — Augmentative and Alternative Communication · Autism Spectrum Helper
+   Single source of truth for color, type, spacing, radii, shadows.
+   Components must use these variables — no ad-hoc values.
+
+   Identity: precise, clinical-modern. Deep blue sound-wave mark, cool neutral
+   surfaces, Inter for Latin + Noto Sans for Indic scripts. Light and dark
+   themes via [data-theme] on <html>; high contrast layers on top of either.
+   ============================================================================ */
+
+:root {
+  /* ---- Brand palette (light theme) ---- */
+  --ac-primary: #1d4ed8;        /* deep blue — headings, emphasis text */
+  --ac-primary-strong: #1e40af; /* pressed / emphasis */
+  --ac-btn-bg: #1d4ed8;         /* filled-button surface (white text, AA in both themes) */
+  --ac-btn-danger-bg: #b42318;  /* filled danger button (white text, AA in both themes) */
+  --ac-accent: #3b82f6;         /* lighter blue — focus, highlights */
+  --ac-accent-strong: #1e63c9;  /* AA-safe accent for text/rings on light */
+  --ac-bg: #f6f8fb;             /* app background */
+  --ac-bg-soft: #eef2f8;        /* wells, empty states */
+  --ac-surface: #ffffff;        /* cards, tiles */
+  --ac-ink: #101828;            /* primary text */
+  --ac-ink-soft: #475467;       /* secondary text (AA on bg) */
+  --ac-line: #d9e0ea;           /* hairline borders */
+  --ac-danger: #b42318;         /* emergency red (AA on white) */
+  --ac-danger-bg: #fdf0ef;
+  --ac-warn-bg: #fff8e6;
+  --ac-warn-border: #b98900;
+  --ac-warn-text: #6d5300;
+  --ac-info-bg: #eaf1fd;
+  --ac-info-border: #1d4ed8;
+  --ac-info-text: #1e40af;
+  --ac-overlay: rgba(9, 14, 24, 0.55);
+
+  /* ---- Fitzgerald Key (modified) — part-of-speech color coding ----------
+     The clinical heart of the app. Applied as a saturated BORDER plus a pale
+     BACKGROUND TINT on every word tile; text is always --ac-ink for contrast.
+     Never repurpose these hues elsewhere in the UI.
+       pronouns   yellow   verbs  green    nouns      orange
+       adjectives blue     social pink     negations  red      */
+  --pos-pronoun-border: #d9a400;  --pos-pronoun-bg: #fff6d6;
+  --pos-verb-border: #2e7d32;     --pos-verb-bg: #e2f2e2;
+  --pos-noun-border: #c05621;     --pos-noun-bg: #ffe9d9;
+  --pos-adjective-border: #2456c9;--pos-adjective-bg: #e3ebff;
+  --pos-social-border: #c2367e;   --pos-social-bg: #ffe3f0;
+  --pos-negation-border: #c1121f; --pos-negation-bg: #ffdfdf;
+
+  /* ---- Type scale (major third-ish, rem) ---- */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.563rem;
+  --text-2xl: 1.953rem;
+  --text-3xl: 2.441rem;
+  /* user-adjustable global text scale (Settings → Text size) */
+  --text-scale: 1;
+
+  /* ---- Font stacks — Inter (Latin) + Noto Sans per script, self-hosted,
+     with system fallbacks so every language renders before fonts load ---- */
+  --font-all: 'Inter', 'Noto Sans Tamil', 'Noto Sans Devanagari',
+    'Noto Sans Telugu', 'Noto Sans Bengali', 'Noto Sans Kannada',
+    'Noto Sans', system-ui, -apple-system, sans-serif;
+
+  /* ---- Spacing (4px base) ---- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 24px;
+  --sp-6: 32px;
+  --sp-7: 48px;
+
+  /* ---- Radii — precise, restrained ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-round: 999px;
+
+  /* ---- Shadows ---- */
+  --shadow-tile: 0 1px 2px rgba(16, 24, 40, 0.06), 0 1px 3px rgba(16, 24, 40, 0.08);
+  --shadow-card: 0 2px 8px rgba(16, 24, 40, 0.08);
+  --shadow-overlay: 0 24px 60px rgba(9, 14, 24, 0.35);
+
+  /* ---- Touch targets ----
+     WCAG/AAC floor is 44px; AACASH defaults larger. Tile gap is adjustable
+     in Settings for keyguard users. */
+  --tap-min: 48px;
+  --tile-gap: 10px;
+
+  /* ---- Focus ring — always visible, never removed ---- */
+  --focus-ring: 0 0 0 4px var(--ac-accent);
+}
+
+/* ============================ DARK THEME =================================
+   Same structure, inverted surfaces. Fitzgerald hues stay recognisable:
+   borders brighten for contrast on dark, tints become deep shades. */
+:root[data-theme='dark'] {
+  --ac-primary: #60a5fa;
+  --ac-primary-strong: #93c5fd;
+  --ac-btn-bg: #2563eb;
+  --ac-btn-danger-bg: #c22218;
+  --ac-accent: #60a5fa;
+  --ac-accent-strong: #93c5fd;
+  --ac-bg: #0b1220;
+  --ac-bg-soft: #0f1728;
+  --ac-surface: #141e33;
+  --ac-ink: #e7edf6;
+  --ac-ink-soft: #9aa8bd;
+  --ac-line: #2a3752;
+  --ac-danger: #f87171;
+  --ac-danger-bg: #2a1414;
+  --ac-warn-bg: #251d05;
+  --ac-warn-border: #d9a400;
+  --ac-warn-text: #f2d98c;
+  --ac-info-bg: #10203c;
+  --ac-info-border: #60a5fa;
+  --ac-info-text: #bfdbfe;
+  --ac-overlay: rgba(0, 0, 0, 0.65);
+
+  --pos-pronoun-border: #eab308;  --pos-pronoun-bg: #2a2405;
+  --pos-verb-border: #4ade80;     --pos-verb-bg: #0c2913;
+  --pos-noun-border: #fb923c;     --pos-noun-bg: #2b1608;
+  --pos-adjective-border: #60a5fa;--pos-adjective-bg: #0d1b33;
+  --pos-social-border: #f472b6;   --pos-social-bg: #2b0f1e;
+  --pos-negation-border: #f87171; --pos-negation-bg: #2b0d0d;
+
+  --shadow-tile: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+/* ======================== HIGH CONTRAST ==================================
+   Layers on top of either theme: pure backgrounds, no tints, no shadows. */
+[data-contrast='high'] {
+  --ac-bg: #ffffff;
+  --ac-bg-soft: #ffffff;
+  --ac-surface: #ffffff;
+  --ac-ink: #000000;
+  --ac-ink-soft: #2b2b2b;
+  --ac-line: #6b6b6b;
+  --pos-pronoun-bg: #ffffff;
+  --pos-verb-bg: #ffffff;
+  --pos-noun-bg: #ffffff;
+  --pos-adjective-bg: #ffffff;
+  --pos-social-bg: #ffffff;
+  --pos-negation-bg: #ffffff;
+  --shadow-tile: none;
+  --shadow-card: none;
+}
+[data-theme='dark'][data-contrast='high'] {
+  --ac-bg: #000000;
+  --ac-bg-soft: #000000;
+  --ac-surface: #000000;
+  --ac-ink: #ffffff;
+  --ac-ink-soft: #d4d4d4;
+  --ac-line: #9a9a9a;
+  --pos-pronoun-bg: #000000;
+  --pos-verb-bg: #000000;
+  --pos-noun-bg: #000000;
+  --pos-adjective-bg: #000000;
+  --pos-social-bg: #000000;
+  --pos-negation-bg: #000000;
+}

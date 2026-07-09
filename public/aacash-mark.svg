@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="AACASH logo: three sound waves">
+  <!-- AACASH MARK — three sound-wave lines radiating from a speaker,
+       reduced to only the lines. Deep navy tile, blue arcs fading outward. -->
+  <rect x="0" y="0" width="128" height="128" rx="28" fill="#0b1220"/>
+  <path d="M42 51 A 21 21 0 0 1 42 77" fill="none" stroke="#93c5fd" stroke-width="11" stroke-linecap="round"/>
+  <path d="M62 38 A 40 40 0 0 1 62 90" fill="none" stroke="#3b82f6" stroke-width="11" stroke-linecap="round"/>
+  <path d="M82 25 A 59 59 0 0 1 82 103" fill="none" stroke="#1d4ed8" stroke-width="11" stroke-linecap="round"/>
+</svg>

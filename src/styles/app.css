@@ -1,0 +1,712 @@
+/* ============================================================================
+   AACASH COMPONENT STYLES — every value from tokens.css
+   ============================================================================ */
+
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: var(--sp-3) var(--sp-3) var(--sp-5);
+  min-height: 100vh;
+}
+
+/* ---- Top bar ---- */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+.topbar-actions {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-4);
+  border-radius: var(--r-md);
+  border: 2px solid var(--ac-line);
+  background: var(--ac-surface);
+  color: var(--ac-ink);
+  font-size: var(--text-md);
+  font-weight: 700;
+  box-shadow: var(--shadow-tile);
+}
+.btn-primary {
+  background: var(--ac-btn-bg);
+  border-color: var(--ac-btn-bg);
+  color: #fff;
+}
+.btn-danger {
+  background: var(--ac-btn-danger-bg);
+  border-color: var(--ac-btn-danger-bg);
+  color: #fff;
+}
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+.icon-btn {
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  padding: 0;
+  border-radius: var(--r-md);
+  border: 2px solid var(--ac-line);
+  background: var(--ac-surface);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-tile);
+}
+
+/* ---- Sentence strip ---- */
+.strip {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-2);
+  background: var(--ac-surface);
+  border: 2px solid var(--ac-line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-2);
+  box-shadow: var(--shadow-card);
+}
+.strip-chips {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  min-height: 68px;
+  padding: 0 var(--sp-1);
+}
+.strip-placeholder {
+  color: var(--ac-ink-soft);
+  font-weight: 600;
+  padding-left: var(--sp-2);
+}
+.strip-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: var(--ac-bg);
+  border-radius: var(--r-sm);
+  padding: var(--sp-1) var(--sp-3);
+  min-width: 60px;
+  flex-shrink: 0;
+}
+.strip-chip-word {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  white-space: nowrap;
+}
+.strip-actions {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+/* ---- Prediction row ---- */
+.pred-row {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: stretch;
+  min-height: 76px;
+}
+.pred-label {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--ac-ink-soft);
+  align-self: center;
+}
+.pred-tile {
+  flex: 1;
+  max-width: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  border: 2px dashed var(--ac-primary);
+  border-radius: var(--r-md);
+  background: var(--ac-surface);
+  font-weight: 700;
+  font-size: var(--text-md);
+  padding: var(--sp-1) var(--sp-2);
+}
+
+.pred-phrase {
+  border-style: solid;
+  background: var(--ac-info-bg);
+  border-color: var(--ac-info-border);
+  color: var(--ac-info-text);
+}
+
+/* ---- Board layout: tabs above; core + fringe share one formatted grid.
+   The inter-panel gap equals the tile gap so the board reads as a single
+   uniform grid of equal cells. ---- */
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  flex: 1;
+  min-height: 0;
+}
+.board-wrap {
+  display: flex;
+  gap: var(--tile-gap);
+  flex: 1;
+  min-height: 0;
+}
+.core-grid {
+  display: grid;
+  grid-auto-flow: column; /* column-major: core words grow downward, never sideways */
+  gap: var(--tile-gap);
+}
+.cat-tabs {
+  display: flex;
+  gap: var(--sp-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+.cat-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: var(--tap-min);
+  padding: 0 var(--sp-3);
+  border-radius: var(--r-round);
+  border: 2px solid var(--ac-line);
+  background: var(--ac-surface);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.cat-tab[aria-selected='true'] {
+  background: var(--ac-btn-bg);
+  border-color: var(--ac-btn-bg);
+  color: #fff;
+}
+.fringe-grid {
+  display: grid;
+  gap: var(--tile-gap);
+  flex: 1;
+}
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  font-weight: 700;
+  color: var(--ac-ink-soft);
+  font-size: var(--text-sm);
+}
+
+/* ---- Word tiles — the clinical heart. White surface, Fitzgerald border +
+   tint, ink text. Nothing decorative competes with the symbol. ---- */
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  min-height: 76px;
+  padding: var(--sp-2) var(--sp-1);
+  border-radius: var(--r-md);
+  border-width: 3px;
+  border-style: solid;
+  background: var(--ac-surface);
+  box-shadow: var(--shadow-tile);
+  overflow: hidden;
+}
+.tile-label {
+  font-size: var(--text-md);
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.15;
+  color: var(--ac-ink);
+  overflow-wrap: anywhere;
+}
+.tile-sub {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ac-ink-soft);
+}
+.tile-img {
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+  border-radius: var(--r-sm);
+}
+/* Fitzgerald Key classes — see tokens.css for the color contract */
+.pos-pronoun   { border-color: var(--pos-pronoun-border);   background: var(--pos-pronoun-bg); }
+.pos-verb      { border-color: var(--pos-verb-border);      background: var(--pos-verb-bg); }
+.pos-noun      { border-color: var(--pos-noun-border);      background: var(--pos-noun-bg); }
+.pos-adjective { border-color: var(--pos-adjective-border); background: var(--pos-adjective-bg); }
+.pos-social    { border-color: var(--pos-social-border);    background: var(--pos-social-bg); }
+.pos-negation  { border-color: var(--pos-negation-border);  background: var(--pos-negation-bg); }
+
+/* ---- Overlays / modals ---- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--ac-overlay);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-4);
+  z-index: 40;
+}
+.modal {
+  background: var(--ac-bg);
+  border-radius: var(--r-xl);
+  padding: var(--sp-5);
+  width: 100%;
+  max-width: 760px;
+  max-height: 92vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-overlay);
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+.modal-title {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--ac-primary);
+}
+
+/* ---- Quick phrases ---- */
+.phrases-group-title {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--ac-primary);
+  margin: var(--sp-4) 0 var(--sp-2);
+}
+.phrases-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--sp-3);
+}
+.phrase-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  text-align: left;
+  padding: var(--sp-3) var(--sp-4);
+  min-height: 72px;
+  border-radius: var(--r-md);
+  border: 3px solid var(--ac-primary);
+  background: var(--ac-surface);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.25;
+  box-shadow: var(--shadow-tile);
+}
+.phrase-btn.tone-danger {
+  border-color: var(--ac-danger);
+  background: var(--ac-danger-bg);
+  color: var(--ac-danger);
+}
+
+/* ---- Forms / caregiver panels ---- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-4);
+}
+.field > label,
+.label {
+  font-size: var(--text-sm);
+  font-weight: 800;
+  color: var(--ac-ink-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.hint {
+  font-size: var(--text-sm);
+  color: var(--ac-ink-soft);
+  line-height: 1.5;
+}
+.card {
+  background: var(--ac-surface);
+  border: 2px solid var(--ac-line);
+  border-radius: var(--r-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-tile);
+}
+.row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+/* ---- Banners ---- */
+.banner {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: flex-start;
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  line-height: 1.5;
+  border: 2px solid;
+}
+.banner-warn {
+  background: var(--ac-warn-bg);
+  border-color: var(--ac-warn-border);
+  color: var(--ac-warn-text);
+}
+.banner-info {
+  background: var(--ac-info-bg);
+  border-color: var(--ac-info-border);
+  color: var(--ac-info-text);
+}
+
+/* ---- Onboarding / empty states — the warm chrome ---- */
+.hero-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-5);
+  background:
+    radial-gradient(circle at 15% 10%, rgba(59, 130, 246, 0.08), transparent 34%),
+    radial-gradient(circle at 85% 90%, rgba(29, 78, 216, 0.07), transparent 36%),
+    var(--ac-bg);
+}
+.hero-card {
+  width: 100%;
+  max-width: 620px;
+  text-align: center;
+}
+.hero-title {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  color: var(--ac-primary);
+  margin: var(--sp-3) 0 var(--sp-1);
+}
+.hero-tagline {
+  font-size: var(--text-lg);
+  color: var(--ac-ink-soft);
+  font-weight: 600;
+  margin-bottom: var(--sp-5);
+}
+.step-dots {
+  display: flex;
+  gap: var(--sp-2);
+  justify-content: center;
+  margin: var(--sp-4) 0;
+}
+.step-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-round);
+  background: var(--ac-line);
+}
+.step-dot.active {
+  background: var(--ac-accent);
+}
+
+/* ---- Responsive: tablet-first; tighten on phones ---- */
+@media (max-width: 720px) {
+  .board-wrap {
+    flex-direction: column;
+  }
+  .core-grid {
+    grid-auto-flow: row; /* stays fixed & documented: phone layout = core block above fringe */
+  }
+  .pred-tile {
+    max-width: none;
+  }
+  .strip {
+    flex-wrap: wrap;
+  }
+  .strip-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media print {
+  .topbar-actions, .strip-actions, .pred-row { display: none; }
+}
+
+/* ---- Username pill (top bar) ---- */
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px 16px 6px 6px;
+  border-radius: var(--r-round);
+  border: 2px solid var(--ac-line);
+  background: var(--ac-surface);
+  box-shadow: var(--shadow-tile);
+}
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--r-round);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--ac-btn-bg), var(--ac-accent));
+  color: #fff;
+  font-weight: 800;
+  font-size: var(--text-md);
+}
+.user-name {
+  font-weight: 800;
+  font-size: var(--text-md);
+  color: var(--ac-ink);
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---- SOS slide-to-call ---- */
+.sos-track {
+  position: relative;
+  height: 72px;
+  border-radius: var(--r-round);
+  border: 3px solid var(--ac-danger);
+  background: var(--ac-danger-bg);
+  overflow: hidden;
+  touch-action: none; /* the slider handles its own pointer gestures */
+  user-select: none;
+}
+.sos-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--ac-btn-danger-bg);
+  opacity: 0.25;
+  pointer-events: none;
+}
+.sos-track-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  color: var(--ac-danger);
+  pointer-events: none;
+  padding: 0 76px;
+  text-align: center;
+}
+.sos-thumb {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 64px;
+  height: 58px;
+  border-radius: var(--r-round);
+  background: var(--ac-btn-danger-bg);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+  cursor: grab;
+}
+.sos-thumb:active {
+  cursor: grabbing;
+}
+
+/* Placeholder cell — keeps the board a complete grid when a category has
+   fewer words than cells. Inert, subtle, never focusable. */
+.tile-empty {
+  border: 2px dashed var(--ac-line);
+  border-radius: var(--r-md);
+  background: var(--ac-bg-soft);
+  opacity: 0.6;
+}
+
+/* ==================== LANDING PAGE ==================== */
+.landing {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(340px, 5fr) 6fr;
+}
+
+/* Brand panel — deep navy, wave mark, feature points */
+.landing-brand {
+  background:
+    radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.18), transparent 45%),
+    radial-gradient(circle at 15% 90%, rgba(29, 78, 216, 0.22), transparent 50%),
+    #0b1220;
+  color: #e7edf6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
+}
+.landing-brand-inner {
+  max-width: 400px;
+}
+.landing-name {
+  font-size: var(--text-3xl);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  margin: var(--sp-4) 0 var(--sp-2);
+  color: #ffffff;
+}
+.landing-sub {
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.5;
+  color: #9db4d8;
+  margin-bottom: var(--sp-6);
+}
+.landing-points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+.landing-points li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-weight: 600;
+  font-size: var(--text-md);
+  color: #cdd9ec;
+}
+
+/* Setup card */
+.landing-form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6) var(--sp-5);
+  background: var(--ac-bg);
+}
+.landing-card {
+  width: 100%;
+  max-width: 460px;
+  background: var(--ac-surface);
+  border: 1px solid var(--ac-line);
+  border-radius: var(--r-xl);
+  padding: var(--sp-6);
+  box-shadow: var(--shadow-card);
+}
+.landing-welcome {
+  font-size: var(--text-2xl);
+  font-weight: 800;
+  color: var(--ac-ink);
+}
+.landing-hint {
+  color: var(--ac-ink-soft);
+  font-weight: 500;
+  margin: var(--sp-1) 0 var(--sp-5);
+}
+.landing-input {
+  font-size: var(--text-lg);
+  padding: 14px 16px;
+  border-radius: var(--r-md);
+  width: 100%;
+}
+.landing-cta {
+  width: 100%;
+  min-height: 56px;
+  font-size: var(--text-lg);
+  border-radius: var(--r-md);
+  margin-top: var(--sp-2);
+}
+
+/* Language chips */
+.lang-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+.lang-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 8px 14px;
+  min-height: var(--tap-min);
+  border-radius: var(--r-md);
+  border: 2px solid var(--ac-line);
+  background: var(--ac-surface);
+  font-weight: 700;
+}
+.lang-chip-native {
+  font-size: var(--text-md);
+  line-height: 1.3;
+  color: var(--ac-ink);
+}
+.lang-chip-en {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--ac-ink-soft);
+}
+.lang-chip.selected {
+  border-color: var(--ac-btn-bg);
+  background: var(--ac-info-bg);
+  box-shadow: inset 0 0 0 1px var(--ac-btn-bg);
+}
+.lang-chip.selected .lang-chip-native {
+  color: var(--ac-primary-strong);
+}
+
+@media (max-width: 860px) {
+  .landing {
+    grid-template-columns: 1fr;
+  }
+  .landing-brand {
+    padding: var(--sp-5);
+  }
+  .landing-brand-inner {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    column-gap: var(--sp-4);
+    align-items: center;
+    max-width: 560px;
+  }
+  .landing-brand-inner svg {
+    grid-row: 1 / 3;
+    width: 64px;
+    height: 64px;
+  }
+  .landing-name {
+    margin: 0;
+    font-size: var(--text-xl);
+  }
+  .landing-sub {
+    margin-bottom: 0;
+    font-size: var(--text-sm);
+  }
+  .landing-points {
+    display: none; /* keep the phone view focused on the form */
+  }
+}
