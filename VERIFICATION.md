@@ -1,67 +1,32 @@
-# Sira — Pre-Deployment Verification Checklist
+# AACASH — pre-deployment human verification checklist
 
-Sira passes the automated accessibility checks (contrast, touch targets, keyboard/switch
-operability, ARIA, privacy). The items below **cannot be automated** and must be checked by
-a human before the app is used by a real child. Treat the SOS items as **safety-critical**.
+AACASH passes automated checks (Lighthouse 98/100/100/100, keyboard/switch operability, ARIA,
+contrast, offline). The items below **cannot be automated** and must be checked by a human
+before the app is used by a real child.
 
----
+## 1. Translations (native-speaker review) ⚠ safety-critical
 
-## 1. Translations (native-speaker review)
+Board words and phrases were machine-authored/carried over and need a fluent speaker of each
+language (Tamil, Hindi, Telugu, Bengali, Marathi, Kannada) to confirm they are correct, natural,
+and child-appropriate:
 
-The symbol words and emergency phrases were generated and need a fluent speaker of each
-language to confirm they are correct, natural, and child-appropriate.
-
-- [ ] **Symbol words** — review all symbols in: Tamil, Hindi, Telugu, Bengali, Marathi, Kannada.
-- [ ] **SOS emergency phrases** ⚠️ **safety-critical** — confirm the 6 default phrases in every
-      language (a wrong emergency phrase is worse than none):
-      help · call my mother · I am in pain · I need the toilet · take me home · call a doctor.
-- [ ] **Spoken output** — listen to each word/phrase; confirm the voice pronounces it correctly
-      (TTS can mispronounce even correct text).
+- [ ] All board words in [src/data/vocabulary.js](src/data/vocabulary.js)
+- [ ] All quick phrases in [src/data/phrases.js](src/data/phrases.js) — **the emergency group
+      first** (a wrong emergency phrase is worse than none)
+- [ ] Listen to spoken output for each — TTS can mispronounce even correct text
 
 ## 2. Speech on the real device
 
-Indic voices are produced by the **local Mac server** (`serve.py`). On other devices the app
-falls back to the browser's built-in voices, which may be silent for Indic languages.
+- [ ] Test on the child's actual device (tablet recommended). Voice availability differs:
+      Chrome desktop bundles online voices; Safari/iOS and Android only speak languages whose
+      system voice is installed (iOS: Settings → Accessibility → Spoken Content → Voices;
+      Android: install Google TTS language data).
+- [ ] Confirm the board language actually speaks aloud, then turn off Wi-Fi and retest.
+- [ ] If the "no voice installed" banner shows, install the voice — don't ship silence.
 
-- [ ] Decide the **actual device** (Mac / tablet / Chromebook) and test speech there.
-- [ ] On a Mac: install voices (System Settings → Accessibility → Spoken Content → Manage Voices)
-      and launch via `Start-Sira.command` so the `/say` bridge is used.
-- [ ] Confirm every language the child will use **actually speaks aloud** on that device.
-- [ ] Confirm it works **offline** (turn off Wi-Fi and retest).
+## 3. With the child and their team
 
-## 3. Screen reader
-
-- [ ] Test with **VoiceOver** (Mac/iOS) or **TalkBack** (Android): tab/swipe through the board,
-      predictions, categories, Speak, SOS, and the language chooser.
-- [ ] Confirm every control announces a sensible name and the spoken words are read correctly.
-
-## 4. Switch access (if the child uses a switch)
-
-- [ ] Enable **single-switch scanning** (footer) and set a comfortable speed.
-- [ ] Confirm the switch device emits **Space/Enter** and that one press selects the highlighted box.
-- [ ] Confirm the child can reach the board, predictions, **SOS**, and **language** by scanning.
-
-## 5. SOS / guardian setup
-
-- [ ] Set a **guardian PIN** (SOS → Guardian setup) so the child can't edit emergency phrases.
-- [ ] Customize phrases for the child (e.g. parent's name/number, medical needs, address).
-- [ ] For custom phrases, **type them in the target language** (custom text is not auto-translated).
-- [ ] Test every SOS phrase aloud in its chosen language.
-
-## 6. Clinical / SLP review
-
-- [ ] Have a Speech-Language Pathologist review **vocabulary**, **layout**, and **symbol set**.
-- [ ] Note: symbols are **emoji** (OpenMoji), not a clinical AAC symbol system (ARASAAC / PCS /
-      SymbolStix). Confirm the child understands them, or plan a symbol-set swap.
-
-## 7. Real-user trial
-
-- [ ] Trial with the child **and** guardian present; observe and adjust speed, vocabulary, and
-      categories before relying on it.
-
----
-
-### Notes
-- All data (name, learned usage, SOS phrases, PIN) is stored **only in the browser** on the
-  device — nothing is sent anywhere. Clearing the browser's site data resets it.
-- The app is designed to run **fully offline** after one-time setup.
+- [ ] Have an SLP review the core word set and grid size choice for this child.
+- [ ] Confirm switch scanning dwell time suits the child's motor abilities.
+- [ ] Record caregiver audio for words the TTS mispronounces (Settings → Edit board → Record voice).
+- [ ] Export a backup (Settings → Export) and store it somewhere safe.
