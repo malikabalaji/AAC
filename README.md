@@ -6,6 +6,14 @@ AACASH is a free, offline-first AAC web app for children and non-speaking people
 Tap picture symbols to build sentences and speak them aloud in **English, Tamil, Hindi,
 Telugu, Bengali, Marathi, or Kannada**. Light and dark themes.
 
+## Getting started
+
+On first run, a split-screen **landing page** collects a username, a caregiver's phone number
+(for SOS), and a board language (choose from tappable script chips — English · தமிழ் · हिन्दी ·
+తెలుగు · বাংলা · मराठी · ಕನ್ನಡ). From then on it opens straight to the board. Everything else —
+grid size, voice, extra guardian numbers, more children — is under the **⚙ Settings** gear in
+the top-right; there is no PIN.
+
 ## AAC principles followed
 
 - **Core vocabulary first** — high-frequency words (I, you, want, help, more, not, …) are always
@@ -29,12 +37,20 @@ Telugu, Bengali, Marathi, or Kannada**. Light and dark themes.
 
 ## Features
 
-Per-child profiles · board editor (add words with photos and recorded audio, hide words,
-favourites, reorder categories) · on-device word **and phrase** prediction — an n-gram model
-blended with the child's own usage, learned per hour of day (kernel-smoothed) and
-weekday/weekend, so the app anticipates whole requests like "I am hungry" before mealtimes ·
-quick phrases incl. emergency, with an adaptive "Right now" section · recents & favourites ·
-dark/light mode · offline-first PWA · JSON backup/restore.
+- **Landing / setup page** — username, caregiver phone, and language in one screen.
+- **Formatted board** — core block + category fringe share one uniform grid; empty cells are
+  kept as placeholders so a category with few words never looks ragged and positions stay fixed.
+- **Guardian SOS** — a red **SOS — call guardian** action (in Settings) with a *slide-to-the-end-
+  and-hold-3-seconds* control so it can't fire by accident. Supports **multiple** guardian
+  numbers, each with its own slider; on a phone it opens the dialer, on desktop it shows the
+  number to dial manually. (Note: `tel:` only places a call on a device with a phone dialer.)
+- **On-device word and phrase prediction** — an n-gram model blended with the child's own usage,
+  learned per hour of day (kernel-smoothed) and weekday/weekend, so the app anticipates whole
+  requests like "I am hungry" before mealtimes. Quick phrases include an adaptive "Right now"
+  section.
+- **Per-child profiles** · board editor (add words with photos and recorded audio, hide words,
+  favourites, reorder categories) · recents & favourites.
+- **Dark / light mode** toggle in the top bar · offline-first PWA · JSON backup & restore.
 
 ## Privacy
 
